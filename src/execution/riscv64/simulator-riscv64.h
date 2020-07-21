@@ -454,12 +454,7 @@ class Simulator : public SimulatorBase {
   template <typename T>
   void WriteMem(int64_t addr, T value, Instruction* instr);
   template <typename T, typename OP>
-  T amo(int64_t addr, OP f, Instruction* instr, TraceType t) {
-    auto lhs = ReadMem<T>(addr, instr);
-    // FIXME: trace memory read for AMO
-    WriteMem<T>(addr, (T)f(lhs), instr);
-    return lhs;
-  }
+  T amo(int64_t addr, OP f, Instruction* instr, TraceType t);
 
   // Helper for debugging memory access.
   inline void DieOrDebug();

@@ -1211,24 +1211,24 @@ void Simulator::TraceMemWr(int64_t addr, T value) {
     switch (sizeof(T)) {
       case 1:
         SNPrintF(trace_buf_,
-                 "                    (%" PRIu64 ")    int8:%" PRId8
+                 "%016" PRIx8 "    (%" PRId64 ")    int8:%" PRId8
                  " uint8:%" PRIu8 " --> [addr: %" PRIx64 "]",
-                 icount_, static_cast<int8_t>(value),
+                 static_cast<int8_t>(value), icount_, static_cast<int8_t>(value),
                  static_cast<uint8_t>(value), addr);
         break;
       case 2:
         SNPrintF(trace_buf_,
-                 "                    (%" PRIu64 ")    int16:%" PRId16
+                 "%016" PRIx16 "    (%" PRId64 ")    int16:%" PRId16
                  " uint16:%" PRIu16 " --> [addr: %" PRIx64 "]",
-                 icount_, static_cast<int16_t>(value),
+                 static_cast<int16_t>(value), icount_, static_cast<int16_t>(value),
                  static_cast<uint16_t>(value), addr);
         break;
       case 4:
         if (std::is_integral<T>::value) {
           SNPrintF(trace_buf_,
-                   "                    (%" PRIu64 ")    int32:%" PRId32
+                   "%016" PRIx32 "    (%" PRId64 ")    int32:%" PRId32
                    " uint32:%" PRIu32 " --> [addr: %" PRIx64 "]",
-                   icount_, static_cast<int32_t>(value),
+                   static_cast<int32_t>(value), icount_, static_cast<int32_t>(value),
                    static_cast<uint32_t>(value), addr);
         } else {
           SNPrintF(trace_buf_,
@@ -1240,9 +1240,9 @@ void Simulator::TraceMemWr(int64_t addr, T value) {
       case 8:
         if (std::is_integral<T>::value) {
           SNPrintF(trace_buf_,
-                   "                    (%" PRIu64 ")    int64:%" PRId64
+                   "%016" PRIx64 "    (%" PRId64 ")    int64:%" PRId64
                    " uint64:%" PRIu64 " --> [addr: %" PRIx64 "]",
-                   icount_, static_cast<int64_t>(value),
+                   static_cast<int64_t>(value), icount_, static_cast<int64_t>(value),
                    static_cast<uint64_t>(value), addr);
         } else {
           SNPrintF(trace_buf_,
@@ -1305,6 +1305,33 @@ void Simulator::WriteMem(int64_t addr, T value, Instruction* instr) {
   T* ptr = reinterpret_cast<T*>(addr);
   TraceMemWr(addr, value);
   *ptr = value;
+}
+
+template <typename T, typename OP>
+T Simulator::amo(int64_t addr, OP f, Instruction* instr, TraceType t) {
+  base::MutexGuard lock_guard(&GlobalMonitor::Get()->mutex);
+  auto lhs = ReadMem<T>(addr, instr);
+  TraceMemRd(addr, lhs, static_cast<int64_t>(lhs));
+
+  if (t == TraceType::WORD) {
+    local_monitor_.NotifyLoadLinked(addr, TransactionSize::Word);
+    GlobalMonitor::Get()->NotifyLoadLinked_Locked(addr, &global_monitor_thread_);
+    lhs = (T)f(lhs);
+    local_monitor_.NotifyStore();
+    GlobalMonitor::Get()->NotifyStore_Locked(&global_monitor_thread_);
+    WriteMem<T>(addr, (T)lhs, instr);
+
+  } else if (t == TraceType::DWORD) {
+    local_monitor_.NotifyLoadLinked(addr, TransactionSize::DoubleWord);
+    GlobalMonitor::Get()->NotifyLoadLinked_Locked(addr, &global_monitor_thread_);
+    lhs = (T)f(lhs);
+    local_monitor_.NotifyStore();
+    GlobalMonitor::Get()->NotifyStore_Locked(&global_monitor_thread_);
+    WriteMem<T>(addr, (T)lhs, instr);
+  } else {
+    assert(false);
+  }
+  return lhs;
 }
 
 // Returns the limit of the stack area to enable checking for stack overflows.
@@ -2081,64 +2108,64 @@ void Simulator::DecodeRVRAType() {
         local_monitor_.NotifyStore();
         GlobalMonitor::Get()->NotifyStore_Locked(&global_monitor_thread_);
         WriteMem<int32_t>(rs1(), (int32_t)rs2(), instr_.instr());
-        set_rd(1, false);
-      } else {
         set_rd(0, false);
+      } else {
+        set_rd(1, false);
       }
       break;
     }
     case RO_AMOSWAP_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return (uint32_t)rs2(); }, instr_.instr(),
-          WORD)));
+          WORD)), false);
       break;
     }
     case RO_AMOADD_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return lhs + (uint32_t)rs2(); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOXOR_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return lhs ^ (uint32_t)rs2(); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOAND_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return lhs & (uint32_t)rs2(); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOOR_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return lhs | (uint32_t)rs2(); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOMIN_W: {
       set_rd(sext32(amo<int32_t>(
           rs1(), [&](int32_t lhs) { return std::min(lhs, (int32_t)rs2()); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOMAX_W: {
       set_rd(sext32(amo<int32_t>(
           rs1(), [&](int32_t lhs) { return std::max(lhs, (int32_t)rs2()); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOMINU_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return std::min(lhs, (uint32_t)rs2()); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
     case RO_AMOMAXU_W: {
       set_rd(sext32(amo<uint32_t>(
           rs1(), [&](uint32_t lhs) { return std::max(lhs, (uint32_t)rs2()); },
-          instr_.instr(), WORD)));
+          instr_.instr(), WORD)), false);
       break;
     }
 #ifdef V8_TARGET_ARCH_64_BIT
@@ -2162,63 +2189,63 @@ void Simulator::DecodeRVRAType() {
               addr, &global_monitor_thread_))) {
         GlobalMonitor::Get()->NotifyStore_Locked(&global_monitor_thread_);
         WriteMem<int64_t>(rs1(), rs2(), instr_.instr());
-        set_rd(1, false);
-      } else {
         set_rd(0, false);
+      } else {
+        set_rd(1, false);
       }
       break;
     }
     case RO_AMOSWAP_D: {
       set_rd(amo<int64_t>(
-          rs1(), [&](int64_t lhs) { return rs2(); }, instr_.instr(), DWORD));
+          rs1(), [&](int64_t lhs) { return rs2(); }, instr_.instr(), DWORD), false);
       break;
     }
     case RO_AMOADD_D: {
       set_rd(amo<int64_t>(
           rs1(), [&](int64_t lhs) { return lhs + rs2(); }, instr_.instr(),
-          DWORD));
+          DWORD), false);
       break;
     }
     case RO_AMOXOR_D: {
       set_rd(amo<int64_t>(
           rs1(), [&](int64_t lhs) { return lhs ^ rs2(); }, instr_.instr(),
-          DWORD));
+          DWORD), false);
       break;
     }
     case RO_AMOAND_D: {
       set_rd(amo<int64_t>(
           rs1(), [&](int64_t lhs) { return lhs & rs2(); }, instr_.instr(),
-          DWORD));
+          DWORD), false);
       break;
     }
     case RO_AMOOR_D: {
       set_rd(amo<int64_t>(
           rs1(), [&](int64_t lhs) { return lhs | rs2(); }, instr_.instr(),
-          DWORD));
+          DWORD), false);
       break;
     }
     case RO_AMOMIN_D: {
       set_rd(amo<int64_t>(
           rs1(), [&](int64_t lhs) { return std::min(lhs, rs2()); },
-          instr_.instr(), DWORD));
+          instr_.instr(), DWORD), false);
       break;
     }
     case RO_AMOMAX_D: {
       set_rd(amo<int64_t>(
           rs1(), [&](int64_t lhs) { return std::max(lhs, rs2()); },
-          instr_.instr(), DWORD));
+          instr_.instr(), DWORD), false);
       break;
     }
     case RO_AMOMINU_D: {
       set_rd(amo<uint64_t>(
           rs1(), [&](uint64_t lhs) { return std::min(lhs, (uint64_t)rs2()); },
-          instr_.instr(), DWORD));
+          instr_.instr(), DWORD), false);
       break;
     }
     case RO_AMOMAXU_D: {
       set_rd(amo<uint64_t>(
           rs1(), [&](uint64_t lhs) { return std::max(lhs, (uint64_t)rs2()); },
-          instr_.instr(), DWORD));
+          instr_.instr(), DWORD), false);
       break;
     }
 #endif /*V8_TARGET_ARCH_64_BIT*/
@@ -3286,12 +3313,12 @@ intptr_t Simulator::CallImpl(Address entry, int argument_count,
   if (reg_arg_count > 7) set_register(a7, arguments[7]);
 
   if (::v8::internal::FLAG_trace_sim) {
-    std::cout << "CallImpl: reg_arg_count = " << reg_arg_count << std::hex
-              << " entry-pc (JSEntry) = 0x" << entry << " a0 (Isolate) = 0x"
-              << get_register(a0) << " a1 (orig_func/new_target) = 0x"
-              << get_register(a1) << " a2 (func/target) = 0x"
-              << get_register(a2) << " a3 (receiver) = 0x" << get_register(a3)
-              << " a4 (argc) = 0x" << get_register(a4) << " a5 (argv) = 0x"
+    std::cout << "CallImpl:\n reg_arg_count = " << reg_arg_count << std::hex
+              << "\n entry-pc (JSEntry) = 0x" << entry << "\n a0 (Isolate) = 0x"
+              << get_register(a0) << "\n a1 (orig_func/new_target) = 0x"
+              << get_register(a1) << "\n a2 (func/target) = 0x"
+              << get_register(a2) << "\n a3 (receiver) = 0x" << get_register(a3)
+              << "\n a4 (argc) = 0x" << get_register(a4) << "\n a5 (argv) = 0x"
               << get_register(a5) << std::endl;
   }
 

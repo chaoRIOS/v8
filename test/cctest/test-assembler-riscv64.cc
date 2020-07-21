@@ -56,6 +56,7 @@ using F5 = void*(void* p0, void* p1, int p2, int p3, int p4);
 #define LARGE_INT_EXCEED_32_BIT 0x01C9'1075'0321'FB01LL
 #define LARGE_INT_UNDER_32_BIT 0x1234'5678
 #define LARGE_UINT_EXCEED_32_BIT 0xFDCB'1234'A034'5691ULL
+#define SAVECONDITIONAL_SUCCESS 0
 
 #define PRINT_RES(res, expected_res, in_hex)                         \
   if (in_hex) std::cout << "[hex-form]" << std::hex;                 \
@@ -64,7 +65,9 @@ using F5 = void*(void* p0, void* p1, int p2, int p3, int p4);
 
 typedef union {
   int32_t i32val;
+  uint32_t ui32val;
   int64_t i64val;
+  uint64_t ui64val;
   float fval;
   double dval;
 } Param_T;
@@ -72,7 +75,9 @@ typedef union {
 static void SetParam(Param_T* params, float val) { params->fval = val; }
 static void SetParam(Param_T* params, double val) { params->dval = val; }
 static void SetParam(Param_T* params, int32_t val) { params->i32val = val; }
+static void SetParam(Param_T* params, uint32_t val) { params->ui32val = val; }
 static void SetParam(Param_T* params, int64_t val) { params->i64val = val; }
+static void SetParam(Param_T* params, uint64_t val) { params->ui64val = val; }
 
 template <typename T, typename std::enable_if<
                           std::is_same<float, T>::value>::type* = nullptr>
@@ -280,6 +285,63 @@ static void GenAndRunTest(INPUT_T input0, INPUT_T input1, INPUT_T input2,
   ValidateResult(res, expected_res);
 }
 
+template <typename INPUT_T, typename OUTPUT_T, typename Func>
+static void GenAndRunTestForAMO(INPUT_T input0, INPUT_T input1, OUTPUT_T expected_res,
+                          Func test_generator) {
+  DCHECK(sizeof(INPUT_T) == 4 || sizeof(INPUT_T) == 8);
+  DCHECK(sizeof(OUTPUT_T) == 4 || sizeof(OUTPUT_T) == 8);
+  Isolate* isolate = CcTest::i_isolate();
+  HandleScope scope(isolate);
+
+  MacroAssembler assm(isolate, v8::internal::CodeObjectRequired::kYes);
+
+  // handle floating-point parameters
+  if (std::is_same<float, INPUT_T>::value) {
+    __ fmv_w_x(fa0, a1);
+    __ fmv_w_x(fa1, a2);
+  } else if (std::is_same<double, INPUT_T>::value) {
+    __ fmv_d_x(fa0, a1);
+    __ fmv_d_x(fa1, a2);
+  }
+  
+  // store base integer
+  if (std::is_same<int32_t, INPUT_T>::value || std::is_same<uint32_t, INPUT_T>::value ) {
+    __ sw(a1, a0, 0);
+  } else if (std::is_same<int64_t, INPUT_T>::value || std::is_same<uint64_t, INPUT_T>::value) {
+    __ sd(a1, a0, 0);
+  }
+  test_generator(assm);
+
+  // handle floating-point result
+  if (std::is_same<float, OUTPUT_T>::value) {
+    __ fmv_x_w(a0, fa0);
+  } else if (std::is_same<double, OUTPUT_T>::value) {
+    __ fmv_x_d(a0, fa0);
+  }
+  __ jr(ra);
+
+  CodeDesc desc;
+  assm.GetCode(isolate, &desc);
+  Handle<Code> code = Factory::CodeBuilder(isolate, desc, Code::STUB).Build();
+  #if defined(DEBUG)
+  code->Print();
+  #endif
+  // setup parameters (to pass floats as integers)
+  Param_T t[2];
+  memset(&t, 0, sizeof(t));
+  SetParam(&t[0], input0);
+  SetParam(&t[1], input1);
+
+  // using IINT_T =
+  //     typename std::conditional<sizeof(INPUT_T) == 4, int32_t, int64_t>::type;
+  // using OINT_T =
+  //     typename std::conditional<sizeof(OUTPUT_T) == 4, int32_t, int64_t>::type;
+  INPUT_T tmp = 0;
+  auto f = GeneratedCode<OUTPUT_T(void* base, INPUT_T, INPUT_T)>::FromCode(*code);
+  auto res = f.Call(&tmp, GetGPRParam<INPUT_T>(&t[0]), GetGPRParam<INPUT_T>(&t[1]));
+  ValidateResult(res, static_cast<OUTPUT_T>(expected_res));
+}
+
 template <typename T, typename Func>
 static void GenAndRunTestForLoadStore(T value, Func test_generator) {
   DCHECK(sizeof(T) == 4 || sizeof(T) == 8);
@@ -320,6 +382,55 @@ static void GenAndRunTestForLoadStore(T value, Func test_generator) {
   auto f = GeneratedCode<INT_T(void* base, INT_T val)>::FromCode(*code);
   auto res = f.Call(&tmp, GetGPRParam<T>(&t));
   ValidateResult(res, value);
+}
+
+template <typename T, typename Func>
+static void GenAndRunTestForLoadReserveStoreConditional(T value, Func test_generator) {
+  DCHECK(sizeof(T) == 4 || sizeof(T) == 8);
+
+  Isolate* isolate = CcTest::i_isolate();
+  HandleScope scope(isolate);
+
+  MacroAssembler assm(isolate, v8::internal::CodeObjectRequired::kYes);
+
+  if (std::is_same<float, T>::value) {
+    __ fmv_w_x(fa0, a1);
+  } else if (std::is_same<double, T>::value) {
+    __ fmv_d_x(fa0, a1);
+  }
+  
+  if (std::is_same<int32_t, T>::value) {
+    __ sw(a1, a0, 0);
+  } else if (std::is_same<int64_t, T>::value) {
+    __ sd(a1, a0, 0);
+  }
+  test_generator(assm);
+
+  if (std::is_same<float, T>::value) {
+    __ fmv_x_w(a0, fa0);
+  } else if (std::is_same<double, T>::value) {
+    __ fmv_x_d(a0, fa0);
+  }
+  __ jr(ra);
+
+  CodeDesc desc;
+  assm.GetCode(isolate, &desc);
+  Handle<Code> code = Factory::CodeBuilder(isolate, desc, Code::STUB).Build();
+  #if defined(DEBUG)
+  code->Print();
+  #endif
+  using INT_T =
+      typename std::conditional<sizeof(T) == 4, int32_t, int64_t>::type;
+
+  // setup parameters (to pass floats as integers)
+  Param_T t;
+  memset(&t, 0, sizeof(t));
+  SetParam(&t, value);
+
+  T tmp = 0;
+  auto f = GeneratedCode<INT_T(void* base, INT_T val)>::FromCode(*code);
+  auto res = f.Call(&tmp, GetGPRParam<T>(&t));
+  ValidateResult(res, static_cast<T>(SAVECONDITIONAL_SUCCESS));
 }
 
 template <typename Func>
@@ -364,6 +475,17 @@ static void GenAndRunTest(int64_t expected_res, Func test_generator) {
     GenAndRunTest<inout_type, inout_type>(rs1_val, expected_res, fn);     \
   }
 
+#define UTEST_AMO_WITH_RES(instr_name, aq, rl, inout_type,             \
+                               rs1_val, rs2_val, expected_res)         \
+  TEST(RISCV_UTEST_##instr_name) {                                     \
+    CcTest::InitializeVM();                                            \
+    auto fn = [](MacroAssembler& assm) {                               \
+      __ instr_name(aq, rl, a0, a0, a2);                                       \
+      };                                                               \
+    GenAndRunTestForAMO<inout_type, inout_type>(rs1_val, rs2_val, expected_res, fn);     \
+  }
+
+
 #define UTEST_LOAD_STORE(ldname, stname, value_type, value) \
   TEST(RISCV_UTEST_##stname##ldname) {                      \
     CcTest::InitializeVM();                                 \
@@ -372,6 +494,15 @@ static void GenAndRunTest(int64_t expected_res, Func test_generator) {
       __ ldname(a0, a0, 0);                                 \
     };                                                      \
     GenAndRunTestForLoadStore<value_type>(value, fn);       \
+  }
+#define UTEST_LOAD_STORE_A(ldname, stname, aq, rl, value_type, value) \
+  TEST(RISCV_UTEST_##stname##ldname) {                      \
+    CcTest::InitializeVM();                                 \
+    auto fn = [](MacroAssembler& assm) {                    \
+      __ ldname(aq, rl, a1, a0);                                 \
+      __ stname(aq, rl, a0, a0, a1);                                 \
+    };                                                      \
+    GenAndRunTestForLoadReserveStoreConditional<value_type>(value, fn);       \
   }
 
 // Since f.Call() is implemented as vararg calls and RISCV calling convention
@@ -548,6 +679,9 @@ static void GenAndRunTest(int64_t expected_res, Func test_generator) {
   UTEST_R2_FORM_WITH_RES(instr_name, inout_type, rs1_val, rs2_val,      \
                          ((rs1_val)tested_op(rs2_val)))
 
+#define UTEST_AMO_WITH_OP(instr_name, aq, rl, inout_type, rs1_val, rs2_val, tested_op) \
+  UTEST_AMO_WITH_RES(instr_name, aq, rl, inout_type, rs1_val, rs2_val, tested_op(rs1_val,rs2_val))
+
 #define UTEST_I_FORM_WITH_OP(instr_name, inout_type, rs1_val, imm12, \
                              tested_op)                              \
   UTEST_I_FORM_WITH_RES(instr_name, inout_type, rs1_val, imm12,      \
@@ -666,33 +800,47 @@ UTEST_R2_FORM_WITH_OP(divuw, int32_t, 1000, 100, /)
 UTEST_R2_FORM_WITH_OP(remw, int32_t, 1234, -91, %)
 UTEST_R2_FORM_WITH_OP(remuw, int32_t, 1234, 43, %)
 
-/*
 // RV32A Standard Extension
-void lr_w(bool aq, bool rl, Register rd, Register rs1);
-void sc_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoswap_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoadd_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoxor_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoand_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoor_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amomin_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amomax_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amominu_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amomaxu_w(bool aq, bool rl, Register rd, Register rs1, Register rs2);
+UTEST_LOAD_STORE_A(lr_w, sc_w, false, false, int32_t, 0x7BB10A9C)
+UTEST_AMO_WITH_OP(amoswap_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return rhs; })
+UTEST_AMO_WITH_OP(amoadd_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return lhs + rhs; })
+UTEST_AMO_WITH_OP(amoxor_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return lhs ^ rhs; })
+UTEST_AMO_WITH_OP(amoand_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return lhs & rhs; })
+UTEST_AMO_WITH_OP(amoor_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return lhs | rhs; })
+UTEST_AMO_WITH_OP(amomin_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return std::min(lhs, rhs); })
+UTEST_AMO_WITH_OP(amomax_w, false, false, int32_t, 
+0xFBB10000, 0x00000A9C, [&](int32_t lhs, int32_t rhs) { return std::max(lhs, rhs); })
+UTEST_AMO_WITH_OP(amominu_w, false, false, uint32_t, 
+0xFBB10000, 0x00000A9C, [&](uint32_t lhs, uint32_t rhs) { return std::min(lhs, rhs); })
+UTEST_AMO_WITH_OP(amomaxu_w, false, false, uint32_t, 
+0xFBB10000, 0x00000A9C, [&](uint32_t lhs, uint32_t rhs) { return std::max(lhs, rhs); })
 
 // RV64A Standard Extension (in addition to RV32A)
-void lr_d(bool aq, bool rl, Register rd, Register rs1);
-void sc_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoswap_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoadd_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoxor_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoand_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amoor_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amomin_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amomax_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amominu_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-void amomaxu_d(bool aq, bool rl, Register rd, Register rs1, Register rs2);
-*/
+UTEST_LOAD_STORE_A(lr_d, sc_d, false, false, int64_t, 0xFBB10A9C12345678)
+UTEST_AMO_WITH_OP(amoswap_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return rhs; })
+UTEST_AMO_WITH_OP(amoadd_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return lhs + rhs; })
+UTEST_AMO_WITH_OP(amoxor_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return lhs ^ rhs; })
+UTEST_AMO_WITH_OP(amoand_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return lhs & rhs; })
+UTEST_AMO_WITH_OP(amoor_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return lhs | rhs; })
+UTEST_AMO_WITH_OP(amomin_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return std::min(lhs, rhs); })
+UTEST_AMO_WITH_OP(amomax_d, false, false, int64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](int64_t lhs, int64_t rhs) { return std::max(lhs, rhs); })
+UTEST_AMO_WITH_OP(amominu_d, false, false, uint64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](uint64_t lhs, uint64_t rhs) { return std::min(lhs, rhs); })
+UTEST_AMO_WITH_OP(amomaxu_d, false, false, uint64_t, 
+0xFBB10A9C00000000, 0x0000000012345678, [&](uint64_t lhs, uint64_t rhs) { return std::max(lhs, rhs); })
 
 // -- RV32F Standard Extension --
 UTEST_LOAD_STORE_F(flw, fsw, float, -2345.678f)
