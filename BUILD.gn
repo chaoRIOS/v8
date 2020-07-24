@@ -547,7 +547,7 @@ config("toolchain") {
 
   # Mips64el/mipsel simulators.
   if (target_is_simulator &&
-      (v8_current_cpu == "mipsel" || v8_current_cpu == "mips64el" || v8_current_cpu == "riscv64")) {
+      (v8_current_cpu == "mipsel" || v8_current_cpu == "mips64el" || v8_current_cpu == "riscv64" || v8_current_cpu == "riscv" )) {
     defines += [ "_MIPS_TARGET_SIMULATOR" ]
   }
 
@@ -3400,15 +3400,15 @@ v8_source_set("v8_base_without_compiler") {
       "src/compiler/backend/riscv/instruction-codes-riscv.h",
       "src/compiler/backend/riscv/instruction-scheduler-riscv.cc",
       "src/compiler/backend/riscv/instruction-selector-riscv.cc",
-      "src/debug/riscv/debug-riscv.cc",
-      "src/deoptimizer/riscv/deoptimizer-riscv.cc",
-      "src/diagnostics/riscv/disasm-riscv.cc",
+      "src/debug/riscv64/debug-riscv64.cc",
+      "src/deoptimizer/riscv64/deoptimizer-riscv64.cc",
+      "src/diagnostics/riscv64/disasm-riscv64.cc",
       "src/execution/riscv/frame-constants-riscv.cc",
       "src/execution/riscv/frame-constants-riscv.h",
       "src/execution/riscv/simulator-riscv.cc",
       "src/execution/riscv/simulator-riscv.h",
-      "src/regexp/riscv/regexp-macro-assembler-riscv.cc",
-      "src/regexp/riscv/regexp-macro-assembler-riscv.h",
+      "src/regexp/riscv64/regexp-macro-assembler-riscv64.cc",
+      "src/regexp/riscv64/regexp-macro-assembler-riscv64.h",
       "src/wasm/baseline/riscv/liftoff-assembler-riscv.h",
     ]
   }

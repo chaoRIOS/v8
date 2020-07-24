@@ -391,9 +391,6 @@ v8_source_set("cctest_sources") {
   }  else if (v8_current_cpu == "riscv") {
     sources += [  ### gcmole(arch:riscv) ###
       "test-assembler-riscv.cc",
-      "test-simple-riscv.cc",
-      "test-disasm-riscv.cc",
-      "test-macro-assembler-riscv.cc",
     ]
   } 
 

@@ -180,7 +180,7 @@
 #error Target architecture riscv64 is only supported on riscv64 and x64 host
 #endif
 #if (V8_TARGET_ARCH_RISCV && \
-     !(V8_HOST_ARCH_X64 || V8_HOST_ARCH_RISCV || V8_HOST_ARCH_RISCV64))
+     !(V8_HOST_ARCH_X64 || V8_HOST_ARCH_IA32 || V8_HOST_ARCH_RISCV || V8_HOST_ARCH_RISCV64))
 #error Target architecture riscv (32) is only supported on riscv(32), riscv64, and x64 host
 #endif
 

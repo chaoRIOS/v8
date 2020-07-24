@@ -26,7 +26,7 @@
 #elif V8_TARGET_ARCH_RISCV64
 #include "src/regexp/riscv64/regexp-macro-assembler-riscv64.h"
 #elif V8_TARGET_ARCH_RISCV
-#include "src/regexp/riscv/regexp-macro-assembler-riscv.h"
+#include "src/regexp/riscv64/regexp-macro-assembler-riscv64.h"
 #else
 #error Unsupported target architecture.
 #endif

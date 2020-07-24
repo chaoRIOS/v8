@@ -521,7 +521,7 @@ void RelocInfo::Verify(Isolate* isolate) {
     }
     case OFF_HEAP_TARGET: {
       Address addr = target_off_heap_target();
-      DEBUG_PRINTF("target_off_heap_target: pc: %lx => addr: %lx\n", pc_, addr);
+      DEBUG_PRINTF("target_off_heap_target: pc: %x => addr: %x\n", pc_, addr);
       CHECK_NE(addr, kNullAddress);
       CHECK(!InstructionStream::TryLookupCode(isolate, addr).is_null());
       break;

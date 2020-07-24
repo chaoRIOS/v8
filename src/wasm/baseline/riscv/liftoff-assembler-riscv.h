@@ -227,7 +227,7 @@ int LiftoffAssembler::PrepareStackFrame() {
   // When constant that represents size of stack frame can't be represented
   // as 16bit we need three instructions to add it to sp, so we reserve space
   // for this case.
-  Daddu(sp, sp, Operand(0L));
+  Daddu(sp, sp, Operand(0,RelocInfo::NONE));
   nop();
   nop();
   return offset;
@@ -323,7 +323,7 @@ void LiftoffAssembler::LoadTaggedPointer(Register dst, Register src_addr,
                                          Register offset_reg,
                                          uint32_t offset_imm,
                                          LiftoffRegList pinned) {
-  STATIC_ASSERT(kTaggedSize == kInt64Size);
+  STATIC_ASSERT(kTaggedSize == kInt32Size);
   Load(LiftoffRegister(dst), src_addr, offset_reg, offset_imm,
        LoadType::kI64Load, pinned);
 }

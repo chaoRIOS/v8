@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if V8_TARGET_ARCH_RISCV64
+#if V8_TARGET_ARCH_RISCV64 || V8_TARGET_ARCH_RISCV
 
 #include "src/base/platform/platform.h"
 #include "src/codegen/macro-assembler.h"

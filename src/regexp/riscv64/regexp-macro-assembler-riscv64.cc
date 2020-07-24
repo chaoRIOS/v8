@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#if V8_TARGET_ARCH_RISCV64
+#if V8_TARGET_ARCH_RISCV64 || V8_TARGET_ARCH_RISCV
 
 #include "src/regexp/riscv64/regexp-macro-assembler-riscv64.h"
 

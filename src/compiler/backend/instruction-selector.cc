@@ -2534,7 +2534,7 @@ void InstructionSelector::VisitSignExtendWord32ToInt64(Node* node) {
 #endif  // V8_TARGET_ARCH_32_BIT
 
 // 64 bit targets do not implement the following instructions.
-#if V8_TARGET_ARCH_64_BIT
+#if V8_TARGET_ARCH_64_BIT || V8_TARGET_ARCH_RISCV
 void InstructionSelector::VisitInt32PairAdd(Node* node) { UNIMPLEMENTED(); }
 
 void InstructionSelector::VisitInt32PairSub(Node* node) { UNIMPLEMENTED(); }
@@ -2548,7 +2548,7 @@ void InstructionSelector::VisitWord32PairShr(Node* node) { UNIMPLEMENTED(); }
 void InstructionSelector::VisitWord32PairSar(Node* node) { UNIMPLEMENTED(); }
 #endif  // V8_TARGET_ARCH_64_BIT
 
-#if !V8_TARGET_ARCH_IA32 && !V8_TARGET_ARCH_ARM && !V8_TARGET_ARCH_MIPS
+#if !V8_TARGET_ARCH_IA32 && !V8_TARGET_ARCH_ARM && !V8_TARGET_ARCH_MIPS && !V8_TARGET_ARCH_RISCV
 void InstructionSelector::VisitWord32AtomicPairLoad(Node* node) {
   UNIMPLEMENTED();
 }
@@ -2587,8 +2587,7 @@ void InstructionSelector::VisitWord32AtomicPairCompareExchange(Node* node) {
 #endif  // !V8_TARGET_ARCH_IA32 && !V8_TARGET_ARCH_ARM && !V8_TARGET_ARCH_MIPS
 
 #if !V8_TARGET_ARCH_X64 && !V8_TARGET_ARCH_ARM64 && !V8_TARGET_ARCH_MIPS64 && \
-    !V8_TARGET_ARCH_S390 && !V8_TARGET_ARCH_PPC && !V8_TARGET_ARCH_RISCV64 && \
-    !V8_TARGET_ARCH_RISCV
+    !V8_TARGET_ARCH_S390 && !V8_TARGET_ARCH_PPC && !V8_TARGET_ARCH_RISCV64 && !V8_TARGET_ARCH_RISCV
 void InstructionSelector::VisitWord64AtomicLoad(Node* node) { UNIMPLEMENTED(); }
 
 void InstructionSelector::VisitWord64AtomicStore(Node* node) {

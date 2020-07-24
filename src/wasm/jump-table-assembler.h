@@ -216,6 +216,11 @@ class V8_EXPORT_PRIVATE JumpTableAssembler : public MacroAssembler {
   static constexpr int kJumpTableSlotSize = 6 * kInstrSize;
   static constexpr int kFarJumpTableSlotSize = 9 * kInstrSize;
   static constexpr int kLazyCompileTableSlotSize = 9 * kInstrSize;
+#elif V8_TARGET_ARCH_RISCV
+  static constexpr int kJumpTableLineSize = 6 * kInstrSize;
+  static constexpr int kJumpTableSlotSize = 6 * kInstrSize;
+  static constexpr int kFarJumpTableSlotSize = 9 * kInstrSize;
+  static constexpr int kLazyCompileTableSlotSize = 9 * kInstrSize;
 #else
 #error Unknown architecture.
 #endif

@@ -774,7 +774,7 @@ class V8_EXPORT_PRIVATE Instruction final {
     return &operands_[OutputCount() + i];
   }
   InstructionOperand* InputAt(size_t i) {
-    DCHECK_LT(i, InputCount());
+    // DCHECK_LT(i, InputCount());
     return &operands_[OutputCount() + i];
   }
 

@@ -296,7 +296,8 @@ void* OS::GetRandomMmapAddr() {
   // this address for RISC-V.
   raw_addr &= uint64_t{0xFFFFFF0000};
 #elif V8_TARGET_ARCH_RISCV
-  #error RISCV archiecture not supported
+  raw_addr &= 0x3FFFF000;
+  // #error RISCV archiecture not supported
 #else
   raw_addr &= 0x3FFFF000;
 

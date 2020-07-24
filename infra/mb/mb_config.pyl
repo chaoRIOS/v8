@@ -39,6 +39,12 @@
       'riscv64.debug.sim': 'default_debug_riscv64_sim',
       'riscv64.optdebug.sim': 'default_optdebug_riscv64_sim',
       'riscv64.release.sim': 'default_release_riscv64_sim',
+      'riscv.debug': 'default_debug_riscv',
+      'riscv.optdebug': 'default_optdebug_riscv',
+      'riscv.release': 'default_release_riscv',
+      'riscv.debug.sim': 'default_debug_riscv_sim',
+      'riscv.optdebug.sim': 'default_optdebug_riscv_sim',
+      'riscv.release.sim': 'default_release_riscv_sim',
       's390x.debug': 'default_debug_s390x',
       's390x.optdebug': 'default_optdebug_s390x',
       's390x.release': 'default_release_s390x',
@@ -170,6 +176,7 @@
       'V8 Linux - s390x - sim': 'release_simulate_s390x',
       # RISC-V
       'V8 Linux - riscv64 - sim': 'release_simulate_riscv64',
+      'V8 Linux - riscv - sim': 'release_simulate_riscv',
     },
     'client.v8.branches': {
       'V8 Linux - beta branch': 'release_x86',
@@ -192,6 +199,8 @@
       'V8 ppc64 - sim - stable branch': 'release_simulate_ppc64',
       'V8 riscv64 - sim - beta branch': 'release_simulate_riscv64',
       'V8 riscv64 - sim - stable branch': 'release_simulate_riscv64',
+      'V8 riscv - sim - beta branch': 'release_simulate_riscv',
+      'V8 riscv - sim - stable branch': 'release_simulate_riscv',
       'V8 s390x - sim - beta branch': 'release_simulate_s390x',
       'V8 s390x - sim - stable branch': 'release_simulate_s390x',
     },
@@ -312,6 +321,18 @@
       'debug', 'simulate_riscv64', 'v8_enable_slow_dchecks'],
     'default_release_riscv64_sim': [
       'release', 'simulate_riscv64'],
+    'default_debug_riscv': [
+      'debug', 'riscv', 'gcc', 'v8_enable_slow_dchecks', 'v8_full_debug'],
+    'default_optdebug_riscv': [
+      'debug', 'riscv', 'gcc', 'v8_enable_slow_dchecks'],
+    'default_release_riscv': [
+      'release', 'riscv', 'gcc'],
+    'default_debug_riscv_sim': [
+      'debug', 'simulate_riscv', 'v8_enable_slow_dchecks', 'v8_full_debug'],
+    'default_optdebug_riscv_sim': [
+      'debug', 'simulate_riscv', 'v8_enable_slow_dchecks'],
+    'default_release_riscv_sim': [
+      'release', 'simulate_riscv'],
     'default_debug_ppc64': [
       'debug', 'ppc64', 'gcc', 'v8_enable_slow_dchecks', 'v8_full_debug'],
     'default_optdebug_ppc64': [
@@ -399,6 +420,8 @@
       'release_bot', 'simulate_ppc64'],
     'release_simulate_riscv64': [
       'release_bot', 'simulate_riscv64'],
+    'release_simulate_riscv': [
+      'release_bot', 'simulate_riscv'],
     'release_simulate_s390x': [
       'release_bot', 'simulate_s390x'],
 
@@ -753,6 +776,10 @@
       'gn_args': 'target_cpu="x64" v8_target_cpu="riscv64"',
     },
 
+    'simulate_riscv': {
+      'gn_args': 'target_cpu="x64" v8_target_cpu="riscv"',
+    },
+
     'simulate_s390x': {
       'gn_args': 'target_cpu="x64" v8_target_cpu="s390x"',
     },
@@ -857,6 +884,10 @@
 
     'riscv64': {
       'gn_args': 'target_cpu="riscv64" use_custom_libcxx=false',
+    },
+
+    'riscv': {
+      'gn_args': 'target_cpu="riscv" use_custom_libcxx=false',
     },
 
     'x64': {
