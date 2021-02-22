@@ -111,6 +111,7 @@ if __name__ == '__main__':
     runs = 100
     suite_path = os.path.join(benchmark_path, "sunspider")
     cmd = os.path.join(csuite_path, "sunspider-standalone-driver.js")
+    print(cmd)
 
   if opts.runs:
     if (float(opts.runs) / runs) < 0.6:
@@ -142,7 +143,8 @@ if __name__ == '__main__':
       % (benchmark_py_path, inner_command, runs, output_path_base)
 
   if mode == "baseline":
-    cmdline = "%s > %s" % (cmdline_base, output_file)
+    # cmdline = "%s > %s" % (cmdline_base, output_file)
+    cmdline = "%s " % (cmdline_base)
   else:
     cmdline = "%s | %s %s" \
         % (cmdline_base, compare_baseline_py_path, output_file)

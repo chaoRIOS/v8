@@ -281,14 +281,17 @@ WASM_EXEC_TEST(I64AtomicStoreLoad) {
       r.builder().AddMemoryElems<uint64_t>(kWasmPageSize / sizeof(uint64_t));
 
   BUILD(r,
-        WASM_ATOMICS_STORE_OP(kExprI64AtomicStore, WASM_ZERO, WASM_GET_LOCAL(0),
+        WASM_ATOMICS_STORE_OP(kExprI64AtomicStore, WASM_I32V_4(123), WASM_GET_LOCAL(0),
                               MachineRepresentation::kWord64),
-        WASM_ATOMICS_LOAD_OP(kExprI64AtomicLoad, WASM_ZERO,
+        WASM_ATOMICS_LOAD_OP(kExprI64AtomicLoad, WASM_I32V_5(222),
                              MachineRepresentation::kWord64));
 
   FOR_UINT64_INPUTS(i) {
     uint64_t expected = i;
-    CHECK_EQ(expected, r.Call(i));
+    uint64_t actual_result = r.Call(i);
+    printf("expected:\t%lu\nresult:\t%lu", expected, actual_result);
+    CHECK_EQ(expected, actual_result);
+    r.GetWrapperCode()->Print();
     CHECK_EQ(expected, r.builder().ReadMemory(&memory[0]));
   }
 }

@@ -1,0 +1,346 @@
+Worker: 0
+Sequence:
+ kExprI64AtomicSub16U   [+6] 0:8242
+[MYDBG]Initializing
+--- WebAssembly code ---
+index: 0
+kind: wasm function
+compiler: TurboFan
+Body (size = 512 = 509 + 3 padding)
+Instructions (size = 488)
+0x3ee22e0500     0  00a00e13       li        t3, 10
+0x3ee22e0504     4  fe810113       addi      sp, sp, -24
+0x3ee22e0508     8  00113823       sd        ra, 16(sp)
+0x3ee22e050c     c  00813423       sd        fp, 8(sp)
+0x3ee22e0510    10  01c13023       sd        t3, 0(sp)
+0x3ee22e0514    14  00810413       addi      fp, sp, 8
+0x3ee22e0518    18  ff810113       addi      sp, sp, -8
+0x3ee22e051c    1c  00a13023       sd        a0, 0(sp)
+0x3ee22e0520    20  01753583       ld        a1, 23(a0)
+0x3ee22e0524    24  01f53703       ld        a4, 31(a0)
+0x3ee22e0528    28  02753783       ld        a5, 39(a0)
+0x3ee22e052c    2c  02061613       slli      a2, a2, 32
+0x3ee22e0530    30  02065613       srli      a2, a2, 32
+0x3ee22e0534    34  00f67833       and       a6, a2, a5
+0x3ee22e0538    38  00658893       addi      a7, a1, 6
+0x3ee22e053c    3c  00700293       li        t0, 7
+0x3ee22e0540    40  00e2b2b3       sltu      t0, t0, a4
+0x3ee22e0544    44  ff970713       addi      a4, a4, -7
+0x3ee22e0548    48  01088333       add       t1, a7, a6
+0x3ee22e054c    4c  00000e13       mv        t3, zero_reg
+0x3ee22e0550    50  17c28863       beq       t0, t3, 368 -> 0x3ee22e06c0  <+0x1c0>
+0x3ee22e0554    54  14e67463       bgeu      a2, a4, 328 -> 0x3ee22e069c  <+0x19c>
+0x3ee22e0558    58  00137993       andi      s3, t1, 0x1
+0x3ee22e055c    5c  10099e63       bne       s3, zero_reg, 284 -> 0x3ee22e0678  <+0x178>
+0x3ee22e0560    60  00008637       lui       a2, 0x8
+0x3ee22e0564    64  24260613       addi      a2, a2, 578
+0x3ee22e0568    68  010883b3       add       t2, a7, a6
+0x3ee22e056c    6c  0073f513       andi      a0, t2, 0x7
+0x3ee22e0570    70  40a383b3       sub       t2, t2, a0
+0x3ee22e0574    74  0035151b       slliw     a0, a0, 3
+0x3ee22e0578    78  0ff0000f       fence
+0x3ee22e057c    7c  1003bbaf       lr.d s7, (t2)
+0x3ee22e0580    80  40abd333       sra       t1, s7, a0
+0x3ee22e0584    84  03031313       slli      t1, t1, 48
+0x3ee22e0588    88  03035313       srli      t1, t1, 48
+0x3ee22e058c    8c  40c30eb3       sub       t4, t1, a2
+0x3ee22e0590    90  00100e13       li        t3, 1
+0x3ee22e0594    94  010e1e13       slli      t3, t3, 16
+0x3ee22e0598    98  fffe0e13       addi      t3, t3, -1
+0x3ee22e059c    9c  01de7f33       and       t5, t3, t4
+0x3ee22e05a0    a0  00af1f33       sll       t5, t5, a0
+0x3ee22e05a4    a4  00ae1e33       sll       t3, t3, a0
+0x3ee22e05a8    a8  fffe4e13       not       t3, t3
+0x3ee22e05ac    ac  017e7bb3       and       s7, t3, s7
+0x3ee22e05b0    b0  01ebebb3       or        s7, s7, t5
+0x3ee22e05b4    b4  1973bbaf       sc.d s7, s7, (t2)
+0x3ee22e05b8    b8  fc0b92e3       bne       s7, zero_reg, -60 -> 0x3ee22e057c  <+0x7c>
+0x3ee22e05bc    bc  0ff0000f       fence
+0x3ee22e05c0    c0  02069613       slli      a2, a3, 32
+0x3ee22e05c4    c4  02065613       srli      a2, a2, 32
+0x3ee22e05c8    c8  00000e13       mv        t3, zero_reg
+0x3ee22e05cc    cc  09c28463       beq       t0, t3, 136 -> 0x3ee22e0654  <+0x154>
+0x3ee22e05d0    d0  06e67063       bgeu      a2, a4, 96 -> 0x3ee22e0630  <+0x130>
+0x3ee22e05d4    d4  00f67633       and       a2, a2, a5
+0x3ee22e05d8    d8  00b605b3       add       a1, a2, a1
+0x3ee22e05dc    dc  00658023       sb        t1, 0(a1)
+0x3ee22e05e0    e0  00835e13       srli      t3, t1, 8
+0x3ee22e05e4    e4  01c580a3       sb        t3, 1(a1)
+0x3ee22e05e8    e8  01035e13       srli      t3, t1, 16
+0x3ee22e05ec    ec  01c58123       sb        t3, 2(a1)
+0x3ee22e05f0    f0  01835e13       srli      t3, t1, 24
+0x3ee22e05f4    f4  01c581a3       sb        t3, 3(a1)
+0x3ee22e05f8    f8  02035e13       srli      t3, t1, 32
+0x3ee22e05fc    fc  01c58223       sb        t3, 4(a1)
+0x3ee22e0600   100  02835e13       srli      t3, t1, 40
+0x3ee22e0604   104  01c582a3       sb        t3, 5(a1)
+0x3ee22e0608   108  03035e13       srli      t3, t1, 48
+0x3ee22e060c   10c  01c58323       sb        t3, 6(a1)
+0x3ee22e0610   110  03835e13       srli      t3, t1, 56
+0x3ee22e0614   114  01c583a3       sb        t3, 7(a1)
+0x3ee22e0618   118  0086851b       addiw     a0, a3, 8
+0x3ee22e061c   11c  00040113       mv        sp, fp
+0x3ee22e0620   120  00013403       ld        fp, 0(sp)
+0x3ee22e0624   124  00813083       ld        ra, 8(sp)
+0x3ee22e0628   128  01010113       addi      sp, sp, 16
+0x3ee22e062c   12c  00008067       ret
+0x3ee22e0630   130  001f7e37       lui       t3, 0x1f7       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x3ee22e0634   134  117e0e13       addi      t3, t3, 279
+0x3ee22e0638   138  00be1e13       slli      t3, t3, 11
+0x3ee22e063c   13c  000e6e13       ori       t3, t3, 0x0
+0x3ee22e0640   140  006e1e13       slli      t3, t3, 6
+0x3ee22e0644   144  038e6e13       ori       t3, t3, 0x38
+0x3ee22e0648   148  000e00e7       jalr      t3
+0x3ee22e064c   14c  00100073       ebreak
+0x3ee22e0650   150  0007f037       lui       zero_reg, 0x7f
+0x3ee22e0654   154  001f7e37       lui       t3, 0x1f7       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x3ee22e0658   158  117e0e13       addi      t3, t3, 279
+0x3ee22e065c   15c  00be1e13       slli      t3, t3, 11
+0x3ee22e0660   160  000e6e13       ori       t3, t3, 0x0
+0x3ee22e0664   164  006e1e13       slli      t3, t3, 6
+0x3ee22e0668   168  038e6e13       ori       t3, t3, 0x38
+0x3ee22e066c   16c  000e00e7       jalr      t3
+0x3ee22e0670   170  00100073       ebreak
+0x3ee22e0674   174  0007f037       lui       zero_reg, 0x7f
+0x3ee22e0678   178  001f7e37       lui       t3, 0x1f7       ;; wasm stub: ThrowWasmTrapUnalignedAccess
+0x3ee22e067c   17c  117e0e13       addi      t3, t3, 279
+0x3ee22e0680   180  00be1e13       slli      t3, t3, 11
+0x3ee22e0684   184  001e6e13       ori       t3, t3, 0x1
+0x3ee22e0688   188  006e1e13       slli      t3, t3, 6
+0x3ee22e068c   18c  010e6e13       ori       t3, t3, 0x10
+0x3ee22e0690   190  000e00e7       jalr      t3
+0x3ee22e0694   194  00100073       ebreak
+0x3ee22e0698   198  0007f037       lui       zero_reg, 0x7f
+0x3ee22e069c   19c  001f7e37       lui       t3, 0x1f7       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x3ee22e06a0   1a0  117e0e13       addi      t3, t3, 279
+0x3ee22e06a4   1a4  00be1e13       slli      t3, t3, 11
+0x3ee22e06a8   1a8  000e6e13       ori       t3, t3, 0x0
+0x3ee22e06ac   1ac  006e1e13       slli      t3, t3, 6
+0x3ee22e06b0   1b0  038e6e13       ori       t3, t3, 0x38
+0x3ee22e06b4   1b4  000e00e7       jalr      t3
+0x3ee22e06b8   1b8  00100073       ebreak
+0x3ee22e06bc   1bc  0007f037       lui       zero_reg, 0x7f
+0x3ee22e06c0   1c0  001f7e37       lui       t3, 0x1f7       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x3ee22e06c4   1c4  117e0e13       addi      t3, t3, 279
+0x3ee22e06c8   1c8  00be1e13       slli      t3, t3, 11
+0x3ee22e06cc   1cc  000e6e13       ori       t3, t3, 0x0
+0x3ee22e06d0   1d0  006e1e13       slli      t3, t3, 6
+0x3ee22e06d4   1d4  038e6e13       ori       t3, t3, 0x38
+0x3ee22e06d8   1d8  000e00e7       jalr      t3
+0x3ee22e06dc   1dc  00100073       ebreak
+0x3ee22e06e0   1e0  0007f037       lui       zero_reg, 0x7f
+0x3ee22e06e4   1e4  00000013       nop
+
+Source positions:
+ pc offset  position
+       130        13
+       178         9
+
+Safepoints (size = 21)
+0x3fe22e04ffffffffff  0000 (sp -> fp)
+
+RelocInfo (size = 7)
+0x3ee22e0630  wasm stub call
+0x3ee22e0654  wasm stub call
+0x3ee22e0678  wasm stub call
+0x3ee22e069c  wasm stub call
+0x3ee22e06c0  wasm stub call
+
+--- End code ---
+function(msg) {
+            if (msg.module) {
+              let module = msg.module;
+              let mem = msg.mem;
+              this.instance = new WebAssembly.Instance(module, {m: {imported_mem: mem}});
+              postMessage({instantiated: true});
+            } else {
+              let address = msg.address;
+              let sequence = msg.sequence;
+              let index = msg.index;
+              let spin = msg.spin;
+              let result = instance.exports["worker" + index](address, sequence, spin);
+              postMessage({index: index, sequence: sequence, result: result});
+            }
+        }
+[MYDBG]Executing
+[MYDBG]Collecting
+[MYDBG]Results
+Worker 0 :[ high : low ]
+[ 00000000 : 00000000 ]
+[MYDBG]Re-constructing
+--- WebAssembly code ---
+index: 0
+kind: wasm function
+compiler: TurboFan
+Body (size = 608 = 593 + 15 padding)
+Instructions (size = 572)
+0xbc29350500     0  00a00e13       li        t3, 10
+0xbc29350504     4  fe810113       addi      sp, sp, -24
+0xbc29350508     8  00113823       sd        ra, 16(sp)
+0xbc2935050c     c  00813423       sd        fp, 8(sp)
+0xbc29350510    10  01c13023       sd        t3, 0(sp)
+0xbc29350514    14  00810413       addi      fp, sp, 8
+0xbc29350518    18  ff810113       addi      sp, sp, -8
+0xbc2935051c    1c  00a13023       sd        a0, 0(sp)
+0xbc29350520    20  01753583       ld        a1, 23(a0)
+0xbc29350524    24  01f53803       ld        a6, 31(a0)
+0xbc29350528    28  02753503       ld        a0, 39(a0)
+0xbc2935052c    2c  00300893       li        a7, 3
+0xbc29350530    30  0108b8b3       sltu      a7, a7, a6
+0xbc29350534    34  ffd80293       addi      t0, a6, -3
+0xbc29350538    38  00000e13       mv        t3, zero_reg
+0xbc2935053c    3c  1dc88c63       beq       a7, t3, 472 -> 0xbc29350714  <+0x214>
+0xbc29350540    40  00000313       mv        t1, zero_reg
+0xbc29350544    44  1a537663       bgeu      t1, t0, 428 -> 0xbc293506f0  <+0x1f0>
+0xbc29350548    48  00057393       andi      t2, a0, 0x0
+0xbc2935054c    4c  00b38bb3       add       s7, t2, a1
+0xbc29350550    50  00cb8023       sb        a2, 0(s7)
+0xbc29350554    54  00865e13       srli      t3, a2, 8
+0xbc29350558    58  01cb80a3       sb        t3, 1(s7)
+0xbc2935055c    5c  01065e13       srli      t3, a2, 16
+0xbc29350560    60  01cb8123       sb        t3, 2(s7)
+0xbc29350564    64  01865e13       srli      t3, a2, 24
+0xbc29350568    68  01cb81a3       sb        t3, 3(s7)
+0xbc2935056c    6c  00000e13       mv        t3, zero_reg
+0xbc29350570    70  15c88e63       beq       a7, t3, 348 -> 0xbc293506cc  <+0x1cc>
+0xbc29350574    74  00400613       li        a2, 4
+0xbc29350578    78  12567863       bgeu      a2, t0, 304 -> 0xbc293506a8  <+0x1a8>
+0xbc2935057c    7c  00457513       andi      a0, a0, 0x4
+0xbc29350580    80  00658613       addi      a2, a1, 6
+0xbc29350584    84  00b50533       add       a0, a0, a1
+0xbc29350588    88  00d50023       sb        a3, 0(a0)
+0xbc2935058c    8c  0086de13       srli      t3, a3, 8
+0xbc29350590    90  01c500a3       sb        t3, 1(a0)
+0xbc29350594    94  0106de13       srli      t3, a3, 16
+0xbc29350598    98  01c50123       sb        t3, 2(a0)
+0xbc2935059c    9c  0186de13       srli      t3, a3, 24
+0xbc293505a0    a0  01c501a3       sb        t3, 3(a0)
+0xbc293505a4    a4  ff980513       addi      a0, a6, -7
+0xbc293505a8    a8  007605b3       add       a1, a2, t2
+0xbc293505ac    ac  00700693       li        a3, 7
+0xbc293505b0    b0  0d06fa63       bgeu      a3, a6, 212 -> 0xbc29350684  <+0x184>
+0xbc293505b4    b4  0aa37663       bgeu      t1, a0, 172 -> 0xbc29350660  <+0x160>
+0xbc293505b8    b8  02071513       slli      a0, a4, 32
+0xbc293505bc    bc  02055513       srli      a0, a0, 32
+0xbc293505c0    c0  02079793       slli      a5, a5, 32
+0xbc293505c4    c4  0015f993       andi      s3, a1, 0x1
+0xbc293505c8    c8  06099a63       bne       s3, zero_reg, 116 -> 0xbc2935063c  <+0x13c>
+0xbc293505cc    cc  00a7e533       or        a0, a5, a0
+0xbc293505d0    d0  007606b3       add       a3, a2, t2
+0xbc293505d4    d4  0076f813       andi      a6, a3, 0x7
+0xbc293505d8    d8  410686b3       sub       a3, a3, a6
+0xbc293505dc    dc  0038181b       slliw     a6, a6, 3
+0xbc293505e0    e0  0ff0000f       fence
+0xbc293505e4    e4  1006b72f       lr.d a4, (a3)
+0xbc293505e8    e8  410755b3       sra       a1, a4, a6
+0xbc293505ec    ec  03059593       slli      a1, a1, 48
+0xbc293505f0    f0  0305d593       srli      a1, a1, 48
+0xbc293505f4    f4  40a587b3       sub       a5, a1, a0
+0xbc293505f8    f8  00100e13       li        t3, 1
+0xbc293505fc    fc  010e1e13       slli      t3, t3, 16
+0xbc29350600   100  fffe0e13       addi      t3, t3, -1
+0xbc29350604   104  00fe7f33       and       t5, t3, a5
+0xbc29350608   108  010f1f33       sll       t5, t5, a6
+0xbc2935060c   10c  010e1e33       sll       t3, t3, a6
+0xbc29350610   110  fffe4e13       not       t3, t3
+0xbc29350614   114  00ee7733       and       a4, t3, a4
+0xbc29350618   118  01e76733       or        a4, a4, t5
+0xbc2935061c   11c  18e6b72f       sc.d a4, a4, (a3)
+0xbc29350620   120  fc0712e3       bne       a4, zero_reg, -60 -> 0xbc293505e4  <+0xe4>
+0xbc29350624   124  0ff0000f       fence
+0xbc29350628   128  00040113       mv        sp, fp
+0xbc2935062c   12c  00013403       ld        fp, 0(sp)
+0xbc29350630   130  00813083       ld        ra, 8(sp)
+0xbc29350634   134  01010113       addi      sp, sp, 16
+0xbc29350638   138  00008067       ret
+0xbc2935063c   13c  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapUnalignedAccess
+0xbc29350640   140  49ae0e13       addi      t3, t3, 1178
+0xbc29350644   144  00be1e13       slli      t3, t3, 11
+0xbc29350648   148  401e6e13       ori       t3, t3, 0x401
+0xbc2935064c   14c  006e1e13       slli      t3, t3, 6
+0xbc29350650   150  010e6e13       ori       t3, t3, 0x10
+0xbc29350654   154  000e00e7       jalr      t3
+0xbc29350658   158  00100073       ebreak
+0xbc2935065c   15c  0007f037       lui       zero_reg, 0x7f
+0xbc29350660   160  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xbc29350664   164  49ae0e13       addi      t3, t3, 1178
+0xbc29350668   168  00be1e13       slli      t3, t3, 11
+0xbc2935066c   16c  400e6e13       ori       t3, t3, 0x400
+0xbc29350670   170  006e1e13       slli      t3, t3, 6
+0xbc29350674   174  038e6e13       ori       t3, t3, 0x38
+0xbc29350678   178  000e00e7       jalr      t3
+0xbc2935067c   17c  00100073       ebreak
+0xbc29350680   180  0007f037       lui       zero_reg, 0x7f
+0xbc29350684   184  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xbc29350688   188  49ae0e13       addi      t3, t3, 1178
+0xbc2935068c   18c  00be1e13       slli      t3, t3, 11
+0xbc29350690   190  400e6e13       ori       t3, t3, 0x400
+0xbc29350694   194  006e1e13       slli      t3, t3, 6
+0xbc29350698   198  038e6e13       ori       t3, t3, 0x38
+0xbc2935069c   19c  000e00e7       jalr      t3
+0xbc293506a0   1a0  00100073       ebreak
+0xbc293506a4   1a4  0007f037       lui       zero_reg, 0x7f
+0xbc293506a8   1a8  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xbc293506ac   1ac  49ae0e13       addi      t3, t3, 1178
+0xbc293506b0   1b0  00be1e13       slli      t3, t3, 11
+0xbc293506b4   1b4  400e6e13       ori       t3, t3, 0x400
+0xbc293506b8   1b8  006e1e13       slli      t3, t3, 6
+0xbc293506bc   1bc  038e6e13       ori       t3, t3, 0x38
+0xbc293506c0   1c0  000e00e7       jalr      t3
+0xbc293506c4   1c4  00100073       ebreak
+0xbc293506c8   1c8  0007f037       lui       zero_reg, 0x7f
+0xbc293506cc   1cc  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xbc293506d0   1d0  49ae0e13       addi      t3, t3, 1178
+0xbc293506d4   1d4  00be1e13       slli      t3, t3, 11
+0xbc293506d8   1d8  400e6e13       ori       t3, t3, 0x400
+0xbc293506dc   1dc  006e1e13       slli      t3, t3, 6
+0xbc293506e0   1e0  038e6e13       ori       t3, t3, 0x38
+0xbc293506e4   1e4  000e00e7       jalr      t3
+0xbc293506e8   1e8  00100073       ebreak
+0xbc293506ec   1ec  0007f037       lui       zero_reg, 0x7f
+0xbc293506f0   1f0  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xbc293506f4   1f4  49ae0e13       addi      t3, t3, 1178
+0xbc293506f8   1f8  00be1e13       slli      t3, t3, 11
+0xbc293506fc   1fc  400e6e13       ori       t3, t3, 0x400
+0xbc29350700   200  006e1e13       slli      t3, t3, 6
+0xbc29350704   204  038e6e13       ori       t3, t3, 0x38
+0xbc29350708   208  000e00e7       jalr      t3
+0xbc2935070c   20c  00100073       ebreak
+0xbc29350710   210  0007f037       lui       zero_reg, 0x7f
+0xbc29350714   214  005e1e37       lui       t3, 0x5e1       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xbc29350718   218  49ae0e13       addi      t3, t3, 1178
+0xbc2935071c   21c  00be1e13       slli      t3, t3, 11
+0xbc29350720   220  400e6e13       ori       t3, t3, 0x400
+0xbc29350724   224  006e1e13       slli      t3, t3, 6
+0xbc29350728   228  038e6e13       ori       t3, t3, 0x38
+0xbc2935072c   22c  000e00e7       jalr      t3
+0xbc29350730   230  00100073       ebreak
+0xbc29350734   234  0007f037       lui       zero_reg, 0x7f
+0xbc29350738   238  00000013       nop
+
+Source positions:
+ pc offset  position
+       13c        27
+       1a8        12
+       1f0         5
+
+Safepoints (size = 21)
+0xbd293504ffffffffff  0000 (sp -> fp)
+
+RelocInfo (size = 9)
+0xbc2935063c  wasm stub call
+0xbc29350660  wasm stub call
+0xbc29350684  wasm stub call
+0xbc293506a8  wasm stub call
+0xbc293506cc  wasm stub call
+0xbc293506f0  wasm stub call
+0xbc29350714  wasm stub call
+
+--- End code ---
+
+State:  0:0
+Opera:  [0:0]   kExprI64AtomicSub16U    [+6] 0:8242
+NewSt:  7dbe0000:0
+
+[MYDBG] PASS at step: 0
+PASS

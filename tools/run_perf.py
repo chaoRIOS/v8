@@ -2,105 +2,105 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""
-Performance runner for d8.
+# """
+# Performance runner for d8.
 
-Call e.g. with tools/run-perf.py --arch ia32 some_suite.json
+# Call e.g. with tools/run-perf.py --arch ia32 some_suite.json
 
-The suite json format is expected to be:
-{
-  "path": <relative path chunks to perf resources and main file>,
-  "owners": [<list of email addresses of benchmark owners (required)>],
-  "name": <optional suite name, file name is default>,
-  "archs": [<architecture name for which this suite is run>, ...],
-  "binary": <name of binary to run, default "d8">,
-  "flags": [<flag to d8>, ...],
-  "test_flags": [<flag to the test file>, ...],
-  "run_count": <how often will this suite run (optional)>,
-  "run_count_XXX": <how often will this suite run for arch XXX (optional)>,
-  "timeout": <how long test is allowed to run>,
-  "timeout_XXX": <how long test is allowed run run for arch XXX>,
-  "retry_count": <how many times to retry failures (in addition to first try)",
-  "retry_count_XXX": <how many times to retry failures for arch XXX>
-  "resources": [<js file to be moved to android device>, ...]
-  "main": <main js perf runner file>,
-  "results_regexp": <optional regexp>,
-  "results_processor": <optional python results processor script>,
-  "units": <the unit specification for the performance dashboard>,
-  "process_size": <flag - collect maximum memory used by the process>,
-  "tests": [
-    {
-      "name": <name of the trace>,
-      "results_regexp": <optional more specific regexp>,
-      "results_processor": <optional python results processor script>,
-      "units": <the unit specification for the performance dashboard>,
-      "process_size": <flag - collect maximum memory used by the process>,
-    }, ...
-  ]
-}
+# The suite json format is expected to be:
+# {
+#   "path": <relative path chunks to perf resources and main file>,
+#   "owners": [<list of email addresses of benchmark owners (required)>],
+#   "name": <optional suite name, file name is default>,
+#   "archs": [<architecture name for which this suite is run>, ...],
+#   "binary": <name of binary to run, default "d8">,
+#   "flags": [<flag to d8>, ...],
+#   "test_flags": [<flag to the test file>, ...],
+#   "run_count": <how often will this suite run (optional)>,
+#   "run_count_XXX": <how often will this suite run for arch XXX (optional)>,
+#   "timeout": <how long test is allowed to run>,
+#   "timeout_XXX": <how long test is allowed run run for arch XXX>,
+#   "retry_count": <how many times to retry failures (in addition to first try)",
+#   "retry_count_XXX": <how many times to retry failures for arch XXX>,
+#   "resources": [<js file to be moved to android device>, ...]
+#   "main": <main js perf runner file>,
+#   "results_regexp": <optional regexp>,
+#   "results_processor": <optional python results processor script>,
+#   "units": <the unit specification for the performance dashboard>,
+#   "process_size": <flag - collect maximum memory used by the process>,
+#   "tests": [
+#     {
+#       "name": <name of the trace>,
+#       "results_regexp": <optional more specific regexp>,
+#       "results_processor": <optional python results processor script>,
+#       "units": <the unit specification for the performance dashboard>,
+#       "process_size": <flag - collect maximum memory used by the process>,
+#     }, ...
+#   ]
+# }
 
-The tests field can also nest other suites in arbitrary depth. A suite
-with a "main" file is a leaf suite that can contain one more level of
-tests.
+# The tests field can also nest other suites in arbitrary depth. A suite
+# with a "main" file is a leaf suite that can contain one more level of
+# tests.
 
-A suite's results_regexp is expected to have one string place holder
-"%s" for the trace name. A trace's results_regexp overwrites suite
-defaults.
+# A suite's results_regexp is expected to have one string place holder
+# "%s" for the trace name. A trace's results_regexp overwrites suite
+# defaults.
 
-A suite's results_processor may point to an optional python script. If
-specified, it is called after running the tests (with a path relative to the
-suite level's path). It is expected to read the measurement's output text
-on stdin and print the processed output to stdout.
+# A suite's results_processor may point to an optional python script. If
+# specified, it is called after running the tests (with a path relative to the
+# suite level's path). It is expected to read the measurement's output text
+# on stdin and print the processed output to stdout.
 
-The results_regexp will be applied to the processed output.
+# The results_regexp will be applied to the processed output.
 
-A suite without "tests" is considered a performance test itself.
+# A suite without "tests" is considered a performance test itself.
 
-Full example (suite with one runner):
-{
-  "path": ["."],
-  "owners": ["username@chromium.org"],
-  "flags": ["--expose-gc"],
-  "test_flags": ["5"],
-  "archs": ["ia32", "x64"],
-  "run_count": 5,
-  "run_count_ia32": 3,
-  "main": "run.js",
-  "results_regexp": "^%s: (.+)$",
-  "units": "score",
-  "tests": [
-    {"name": "Richards"},
-    {"name": "DeltaBlue"},
-    {"name": "NavierStokes",
-     "results_regexp": "^NavierStokes: (.+)$"}
-  ]
-}
+# Full example (suite with one runner):
+# {
+#   "path": ["."],
+#   "owners": ["username@chromium.org"],
+#   "flags": ["--expose-gc"],
+#   "test_flags": ["5"],
+#   "archs": ["ia32", "x64"],
+#   "run_count": 5,
+#   "run_count_ia32": 3,
+#   "main": "run.js",
+#   "results_regexp": "^%s: (.+)$",
+#   "units": "score",
+#   "tests": [
+#     {"name": "Richards"},
+#     {"name": "DeltaBlue"},
+#     {"name": "NavierStokes",
+#      "results_regexp": "^NavierStokes: (.+)$"}
+#   ]
+# }
 
-Full example (suite with several runners):
-{
-  "path": ["."],
-  "owners": ["username@chromium.org", "otherowner@google.com"],
-  "flags": ["--expose-gc"],
-  "archs": ["ia32", "x64"],
-  "run_count": 5,
-  "units": "score",
-  "tests": [
-    {"name": "Richards",
-     "path": ["richards"],
-     "main": "run.js",
-     "run_count": 3,
-     "results_regexp": "^Richards: (.+)$"},
-    {"name": "NavierStokes",
-     "path": ["navier_stokes"],
-     "main": "run.js",
-     "results_regexp": "^NavierStokes: (.+)$"}
-  ]
-}
+# Full example (suite with several runners):
+# {
+#   "path": ["."],
+#   "owners": ["username@chromium.org", "otherowner@google.com"],
+#   "flags": ["--expose-gc"],
+#   "archs": ["ia32", "x64"],
+#   "run_count": 5,
+#   "units": "score",
+#   "tests": [
+#     {"name": "Richards",
+#      "path": ["richards"],
+#      "main": "run.js",
+#      "run_count": 3,
+#      "results_regexp": "^Richards: (.+)$"},
+#     {"name": "NavierStokes",
+#      "path": ["navier_stokes"],
+#      "main": "run.js",
+#      "results_regexp": "^NavierStokes: (.+)$"}
+#   ]
+# }
 
-Path pieces are concatenated. D8 is always run with the suite's path as cwd.
+# Path pieces are concatenated. D8 is always run with the suite's path as cwd.
 
-The test flags are passed to the js test file after '--'.
-"""
+# The test flags are passed to the js test file after '--'.
+# """
 
 # for py2/py3 compatibility
 from __future__ import print_function
@@ -136,7 +136,8 @@ SUPPORTED_ARCHS = ['arm',
                    'mips',
                    'mipsel',
                    'x64',
-                   'arm64']
+                   'arm64',
+                   'riscv64']
 
 GENERIC_RESULTS_RE = re.compile(r'^RESULT ([^:]+): ([^=]+)= ([^ ]+) ([^ ]*)$')
 RESULT_STDDEV_RE = re.compile(r'^\{([^\}]+)\}$')

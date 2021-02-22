@@ -1,0 +1,239 @@
+Worker: 0
+Sequence:
+ kExprI64AtomicSub16U   [+6] 0:8242
+[MYDBG]Initializing
+--- WebAssembly code ---
+index: 0
+kind: wasm function
+compiler: TurboFan
+Body (size = 416 = 393 + 23 padding)
+Instructions (size = 372)
+0xc822143e3a0     0  55             push rbp
+0xc822143e3a1     1  4889e5         REX.W movq rbp,rsp
+0xc822143e3a4     4  6a0a           push 0xa
+0xc822143e3a6     6  56             push rsi
+0xc822143e3a7     7  488b5e0b       REX.W movq rbx,[rsi+0xb]
+0xc822143e3ab     b  488b4e13       REX.W movq rcx,[rsi+0x13]
+0xc822143e3af     f  8bf0           movl rsi,rax
+0xc822143e3b1    11  49ba0000000001000000 REX.W movq r10,0x100000000
+0xc822143e3bb    1b  4c3bd6         REX.W cmpq r10,rsi
+0xc822143e3be    1e  7720           ja 0xc822143e3e0  <+0x40>
+0xc822143e3c0    20  bf01000000     movl rdi,0x1
+0xc822143e3c5    25  4989e2         REX.W movq r10,rsp
+0xc822143e3c8    28  4883ec08       REX.W subq rsp,0x8
+0xc822143e3cc    2c  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e3d0    30  4c891424       REX.W movq [rsp],r10
+0xc822143e3d4    34  48b810904ee7657f0000 REX.W movq rax,0x7f65e74e9010    ;; external reference (unknown)
+0xc822143e3de    3e  ffd0           call rax
+0xc822143e3e0    40  488d7b06       REX.W leaq rdi,[rbx+0x6]
+0xc822143e3e4    44  4c8d41f9       REX.W leaq r8,[rcx-0x7]
+0xc822143e3e8    48  4c8d0c37       REX.W leaq r9,[rdi+rsi*1]
+0xc822143e3ec    4c  4883f907       REX.W cmpq rcx,0x7
+0xc822143e3f0    50  0f86f8000000   jna 0xc822143e4ee  <+0x14e>
+0xc822143e3f6    56  4983e101       REX.W andq r9,0x1
+0xc822143e3fa    5a  493bf0         REX.W cmpq rsi,r8
+0xc822143e3fd    5d  0f83c9000000   jnc 0xc822143e4cc  <+0x12c>
+0xc822143e403    63  4183f900       cmpl r9,0x0
+0xc822143e407    67  0f859d000000   jnz 0xc822143e4aa  <+0x10a>
+0xc822143e40d    6d  b942820000     movl rcx,0x8242
+0xc822143e412    72  668b0437       movw rax,[rdi+rsi*1]
+0xc822143e416    76  4c8bc0         REX.W movq r8,rax
+0xc822143e419    79  4c2bc1         REX.W subq r8,rcx
+0xc822143e41c    7c  f066440fb10437 lock cmpxchgw [rdi+rsi*1],r8
+0xc822143e423    83  75ed           jnz 0xc822143e412  <+0x72>
+0xc822143e425    85  0fb7c0         movzxwl rax,rax
+0xc822143e428    88  8bca           movl rcx,rdx
+0xc822143e42a    8a  4c8b1582ffffff REX.W movq r10,[rip+0xffffff82]
+0xc822143e431    91  4c3bd1         REX.W cmpq r10,rcx
+0xc822143e434    94  771d           ja 0xc822143e453  <+0xb3>
+0xc822143e436    96  bf01000000     movl rdi,0x1
+0xc822143e43b    9b  4989e2         REX.W movq r10,rsp
+0xc822143e43e    9e  4883ec08       REX.W subq rsp,0x8
+0xc822143e442    a2  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e446    a6  4c891424       REX.W movq [rsp],r10
+0xc822143e44a    aa  488b0585ffffff REX.W movq rax,[rip+0xffffff85]
+0xc822143e451    b1  ffd0           call rax
+0xc822143e453    b3  4889040b       REX.W movq [rbx+rcx*1],rax
+0xc822143e457    b7  8d4208         leal rax,[rdx+0x8]
+0xc822143e45a    ba  4c8b1552ffffff REX.W movq r10,[rip+0xffffff52]
+0xc822143e461    c1  4c3bd0         REX.W cmpq r10,rax
+0xc822143e464    c4  771d           ja 0xc822143e483  <+0xe3>
+0xc822143e466    c6  bf01000000     movl rdi,0x1
+0xc822143e46b    cb  4989e2         REX.W movq r10,rsp
+0xc822143e46e    ce  4883ec08       REX.W subq rsp,0x8
+0xc822143e472    d2  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e476    d6  4c891424       REX.W movq [rsp],r10
+0xc822143e47a    da  488b0555ffffff REX.W movq rax,[rip+0xffffff55]
+0xc822143e481    e1  ffd0           call rax
+0xc822143e483    e3  488be5         REX.W movq rsp,rbp
+0xc822143e486    e6  5d             pop rbp
+0xc822143e487    e7  c3             retl
+0xc822143e488    e8  e8c3fbffff     call 0xc822143e050       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xc822143e48d    ed  bf2d000000     movl rdi,0x2d
+0xc822143e492    f2  4989e2         REX.W movq r10,rsp
+0xc822143e495    f5  4883ec08       REX.W subq rsp,0x8
+0xc822143e499    f9  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e49d    fd  4c891424       REX.W movq [rsp],r10
+0xc822143e4a1   101  488b052effffff REX.W movq rax,[rip+0xffffff2e]
+0xc822143e4a8   108  ffd0           call rax
+0xc822143e4aa   10a  e8b1fbffff     call 0xc822143e060       ;; wasm stub: ThrowWasmTrapUnalignedAccess
+0xc822143e4af   10f  bf2d000000     movl rdi,0x2d
+0xc822143e4b4   114  4989e2         REX.W movq r10,rsp
+0xc822143e4b7   117  4883ec08       REX.W subq rsp,0x8
+0xc822143e4bb   11b  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e4bf   11f  4c891424       REX.W movq [rsp],r10
+0xc822143e4c3   123  488b050cffffff REX.W movq rax,[rip+0xffffff0c]
+0xc822143e4ca   12a  ffd0           call rax
+0xc822143e4cc   12c  e87ffbffff     call 0xc822143e050       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xc822143e4d1   131  bf2d000000     movl rdi,0x2d
+0xc822143e4d6   136  4989e2         REX.W movq r10,rsp
+0xc822143e4d9   139  4883ec08       REX.W subq rsp,0x8
+0xc822143e4dd   13d  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e4e1   141  4c891424       REX.W movq [rsp],r10
+0xc822143e4e5   145  488b05eafeffff REX.W movq rax,[rip+0xfffffeea]
+0xc822143e4ec   14c  ffd0           call rax
+0xc822143e4ee   14e  e85dfbffff     call 0xc822143e050       ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0xc822143e4f3   153  bf2d000000     movl rdi,0x2d
+0xc822143e4f8   158  4989e2         REX.W movq r10,rsp
+0xc822143e4fb   15b  4883ec08       REX.W subq rsp,0x8
+0xc822143e4ff   15f  4883e4f0       REX.W andq rsp,0xf0
+0xc822143e503   163  4c891424       REX.W movq [rsp],r10
+0xc822143e507   167  488b05c8feffff REX.W movq rax,[rip+0xfffffec8]
+0xc822143e50e   16e  ffd0           call rax
+0xc822143e510   170  90             nop
+0xc822143e511   171  0f1f00         nop
+
+Protected instructions:
+ pc offset  land pad
+        b3        e8
+
+Source positions:
+ pc offset  position
+        b3        13
+       10a         9
+
+Safepoints (size = 21)
+0xc832143e39fffffffff  0000 (sp -> fp)
+
+RelocInfo (size = 8)
+0xc822143e3d6  external reference (0x7f65e74e9010)
+0xc822143e489  wasm stub call
+0xc822143e4ab  wasm stub call
+0xc822143e4cd  wasm stub call
+0xc822143e4ef  wasm stub call
+
+--- End code ---
+[MYDBG]Executing
+[MYDBG]Collecting
+[MYDBG]Results
+Worker 0 :[ high : low ]
+[ 00000000 : 00000000 ]
+[MYDBG]Re-constructing
+--- WebAssembly code ---
+index: 0
+kind: wasm function
+compiler: TurboFan
+Body (size = 320 = 289 + 31 padding)
+Instructions (size = 268)
+0x356f039873a0     0  55             push rbp
+0x356f039873a1     1  4889e5         REX.W movq rbp,rsp
+0x356f039873a4     4  6a0a           push 0xa
+0x356f039873a6     6  56             push rsi
+0x356f039873a7     7  488b7e0b       REX.W movq rdi,[rsi+0xb]
+0x356f039873ab     b  488b7613       REX.W movq rsi,[rsi+0x13]
+0x356f039873af     f  8907           movl [rdi],rax
+0x356f039873b1    11  895704         movl [rdi+0x4],rdx
+0x356f039873b4    14  488d46f9       REX.W leaq rax,[rsi-0x7]
+0x356f039873b8    18  4883fe07       REX.W cmpq rsi,0x7
+0x356f039873bc    1c  0f8680000000   jna 0x356f03987442  <+0xa2>
+0x356f039873c2    22  8bd1           movl rdx,rcx
+0x356f039873c4    24  49ba0000000001000000 REX.W movq r10,0x100000000
+0x356f039873ce    2e  4c3bd2         REX.W cmpq r10,rdx
+0x356f039873d1    31  7720           ja 0x356f039873f3  <+0x53>
+0x356f039873d3    33  bf01000000     movl rdi,0x1
+0x356f039873d8    38  4989e2         REX.W movq r10,rsp
+0x356f039873db    3b  4883ec08       REX.W subq rsp,0x8
+0x356f039873df    3f  4883e4f0       REX.W andq rsp,0xf0
+0x356f039873e3    43  4c891424       REX.W movq [rsp],r10
+0x356f039873e7    47  48b810904ee7657f0000 REX.W movq rax,0x7f65e74e9010    ;; external reference (unknown)
+0x356f039873f1    51  ffd0           call rax
+0x356f039873f3    53  48c1e320       REX.W shlq rbx, 32
+0x356f039873f7    57  4883f800       REX.W cmpq rax,0x0
+0x356f039873fb    5b  0f861f000000   jna 0x356f03987420  <+0x80>
+0x356f03987401    61  480bd3         REX.W orq rdx,rbx
+0x356f03987404    64  488d5f06       REX.W leaq rbx,[rdi+0x6]
+0x356f03987408    68  668b03         movw rax,[rbx]
+0x356f0398740b    6b  488bc8         REX.W movq rcx,rax
+0x356f0398740e    6e  482bca         REX.W subq rcx,rdx
+0x356f03987411    71  f0660fb10b     lock cmpxchgw [rbx],rcx
+0x356f03987416    76  75f0           jnz 0x356f03987408  <+0x68>
+0x356f03987418    78  0fb7c0         movzxwl rax,rax
+0x356f0398741b    7b  488be5         REX.W movq rsp,rbp
+0x356f0398741e    7e  5d             pop rbp
+0x356f0398741f    7f  c3             retl
+0x356f03987420    80  e82bfcffff     call 0x356f03987050     ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x356f03987425    85  bf2d000000     movl rdi,0x2d
+0x356f0398742a    8a  4989e2         REX.W movq r10,rsp
+0x356f0398742d    8d  4883ec08       REX.W subq rsp,0x8
+0x356f03987431    91  4883e4f0       REX.W andq rsp,0xf0
+0x356f03987435    95  4c891424       REX.W movq [rsp],r10
+0x356f03987439    99  488b05a9ffffff REX.W movq rax,[rip+0xffffffa9]
+0x356f03987440    a0  ffd0           call rax
+0x356f03987442    a2  e809fcffff     call 0x356f03987050     ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x356f03987447    a7  bf2d000000     movl rdi,0x2d
+0x356f0398744c    ac  4989e2         REX.W movq r10,rsp
+0x356f0398744f    af  4883ec08       REX.W subq rsp,0x8
+0x356f03987453    b3  4883e4f0       REX.W andq rsp,0xf0
+0x356f03987457    b7  4c891424       REX.W movq [rsp],r10
+0x356f0398745b    bb  488b0587ffffff REX.W movq rax,[rip+0xffffff87]
+0x356f03987462    c2  ffd0           call rax
+0x356f03987464    c4  e8e7fbffff     call 0x356f03987050     ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x356f03987469    c9  bf2d000000     movl rdi,0x2d
+0x356f0398746e    ce  4989e2         REX.W movq r10,rsp
+0x356f03987471    d1  4883ec08       REX.W subq rsp,0x8
+0x356f03987475    d5  4883e4f0       REX.W andq rsp,0xf0
+0x356f03987479    d9  4c891424       REX.W movq [rsp],r10
+0x356f0398747d    dd  488b0565ffffff REX.W movq rax,[rip+0xffffff65]
+0x356f03987484    e4  ffd0           call rax
+0x356f03987486    e6  e8c5fbffff     call 0x356f03987050     ;; wasm stub: ThrowWasmTrapMemOutOfBounds
+0x356f0398748b    eb  bf2d000000     movl rdi,0x2d
+0x356f03987490    f0  4989e2         REX.W movq r10,rsp
+0x356f03987493    f3  4883ec08       REX.W subq rsp,0x8
+0x356f03987497    f7  4883e4f0       REX.W andq rsp,0xf0
+0x356f0398749b    fb  4c891424       REX.W movq [rsp],r10
+0x356f0398749f    ff  488b0543ffffff REX.W movq rax,[rip+0xffffff43]
+0x356f039874a6   106  ffd0           call rax
+0x356f039874a8   108  90             nop
+0x356f039874a9   109  0f1f00         nop
+
+Protected instructions:
+ pc offset  land pad
+        11        c4
+         f        e6
+
+Source positions:
+ pc offset  position
+         f         5
+        11        12
+        80        27
+        c4        12
+        e6         5
+
+Safepoints (size = 21)
+0x35700398739fffffffff  0000 (sp -> fp)
+
+RelocInfo (size = 8)
+0x356f039873e9  external reference (0x7f65e74e9010)
+0x356f03987421  wasm stub call
+0x356f03987443  wasm stub call
+0x356f03987465  wasm stub call
+0x356f03987487  wasm stub call
+
+--- End code ---
+
+State:  0:0
+Opera:  [0:0]   kExprI64AtomicSub16U    [+6] 0:8242
+NewSt:  7dbe0000:0
+
+[MYDBG] PASS at step: 0
+PASS

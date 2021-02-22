@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <queue>
+#include <iostream>
 
 #include "include/libplatform/libplatform.h"
 #include "src/base/debug/stack_trace.h"
@@ -83,6 +84,7 @@ int GetActualThreadPoolSize(int thread_pool_size) {
   if (thread_pool_size < 1) {
     thread_pool_size = base::SysInfo::NumberOfProcessors() - 1;
   }
+  return 0;
   return std::max(std::min(thread_pool_size, kMaxThreadPoolSize), 1);
 }
 }  // namespace
@@ -127,7 +129,7 @@ void DefaultPlatform::EnsureBackgroundTaskRunnerInitialized() {
         std::make_shared<DefaultWorkerThreadsTaskRunner>(
             thread_pool_size_, time_function_for_testing_
                                    ? time_function_for_testing_
-                                   : DefaultTimeFunction);
+                                   : DefaultTimeFunction, "INIT");
   }
 }
 

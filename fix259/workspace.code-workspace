@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"fstream": "cpp",
+			"unordered_set": "cpp",
+			"thread": "cpp"
+		}
+	}
+}

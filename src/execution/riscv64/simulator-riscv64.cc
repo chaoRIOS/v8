@@ -49,6 +49,8 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include<iostream>
+#include<thread>
 
 #include "src/base/bits.h"
 #include "src/codegen/assembler-inl.h"
@@ -2079,19 +2081,44 @@ void Simulator::DecodeRVRAType() {
       local_monitor_.NotifyLoadLinked(addr, TransactionSize::Word);
       GlobalMonitor::Get()->NotifyLoadLinked_Locked(addr,
                                                     &global_monitor_thread_);
+                                                    
+      // std::thread::id tid = std::this_thread::get_id();
+
+      std::ostringstream oss;
+
+      oss << std::this_thread::get_id();
+
+      std::string stid = oss.str();
+
+      unsigned long long tid = std::stoull(stid);
+      printf("[CDBG] Thr %llu\tLRW 0x%lx\n", tid, addr);
       break;
     }
     case RO_SC_W: {
       int64_t addr = rs1();
       base::MutexGuard lock_guard(&GlobalMonitor::Get()->mutex);
-      if (local_monitor_.NotifyStoreConditional(addr, TransactionSize::Word) &&
+      // std::thread::id tid = std::this_thread::get_id();
+
+      std::ostringstream oss;
+
+      oss << std::this_thread::get_id();
+
+      std::string stid = oss.str();
+
+      unsigned long long tid = std::stoull(stid);
+      printf("[CDBG] Thr %llu\tSCW 0x%lx\t", tid, addr);
+
+      if (local_monitor_.NotifyStoreConditional(addr, 
+                                                TransactionSize::Word) &&
           GlobalMonitor::Get()->NotifyStoreConditional_Locked(
               addr, &global_monitor_thread_)) {
+        printf("Success\n");
         local_monitor_.NotifyStore();
         GlobalMonitor::Get()->NotifyStore_Locked(&global_monitor_thread_);
         WriteMem<int32_t>(rs1(), (int32_t)rs2(), instr_.instr());
         set_rd(0, false);
       } else {
+        printf("Fail\n");
         set_rd(1, false);
       }
       break;
@@ -2160,19 +2187,43 @@ void Simulator::DecodeRVRAType() {
       local_monitor_.NotifyLoadLinked(addr, TransactionSize::DoubleWord);
       GlobalMonitor::Get()->NotifyLoadLinked_Locked(addr,
                                                     &global_monitor_thread_);
+      // std::thread::id tid = std::this_thread::get_id();
+
+      std::ostringstream oss;
+
+      oss << std::this_thread::get_id();
+
+      std::string stid = oss.str();
+
+      unsigned long long tid = std::stoull(stid);
+      printf("[CDBG] Thr %llu\tLRD 0x%lx\n", tid, addr);
+
       break;
     }
     case RO_SC_D: {
       int64_t addr = rs1();
       base::MutexGuard lock_guard(&GlobalMonitor::Get()->mutex);
+      // std::thread::id tid = std::this_thread::get_id();
+
+      std::ostringstream oss;
+
+      oss << std::this_thread::get_id();
+
+      std::string stid = oss.str();
+
+      unsigned long long tid = std::stoull(stid);
+      printf("[CDBG] Thr %llu\tSCD 0x%lx\t", tid, addr);
       if (local_monitor_.NotifyStoreConditional(addr,
                                                 TransactionSize::DoubleWord) &&
-          (GlobalMonitor::Get()->NotifyStoreConditional_Locked(
-              addr, &global_monitor_thread_))) {
+          GlobalMonitor::Get()->NotifyStoreConditional_Locked(
+              addr, &global_monitor_thread_)) {
+        printf("Success\n");
+        local_monitor_.NotifyStore();
         GlobalMonitor::Get()->NotifyStore_Locked(&global_monitor_thread_);
         WriteMem<int64_t>(rs1(), rs2(), instr_.instr());
         set_rd(0, false);
       } else {
+        printf("Fail\n");
         set_rd(1, false);
       }
       break;
@@ -3612,10 +3663,12 @@ bool Simulator::LocalMonitor::NotifyStoreConditional(uintptr_t addr,
       Clear();
       return true;
     } else {
+      Clear();
       return false;
     }
   } else {
     DCHECK(access_state_ == MonitorAccess::Open);
+    Clear();
     return false;
   }
 }
@@ -3671,6 +3724,10 @@ bool Simulator::GlobalMonitor::LinkedAddress::NotifyStoreConditional_Locked(
       return false;
     }
   }
+  if (is_requesting_thread) {
+    printf("[CDBG] Fail state at this thread\n");
+  } 
+  Clear_Locked();
   return false;
 }
 

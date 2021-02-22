@@ -25,19 +25,22 @@
  */
 
 var suitePath = "sunspider-0.9.1";
-var tests = [ "3d-cube", "3d-morph", "3d-raytrace",
-              "access-binary-trees", "access-fannkuch",
-              "access-nbody", "access-nsieve",
-              "bitops-3bit-bits-in-byte", "bitops-bits-in-byte",
-              "bitops-bitwise-and", "bitops-nsieve-bits",
-              "controlflow-recursive", "crypto-aes",
-              "crypto-md5", "crypto-sha1", "date-format-tofte",
-              "date-format-xparb", "math-cordic", "math-partial-sums",
-              "math-spectral-norm", "regexp-dna", "string-base64",
-              "string-fasta", "string-tagcloud", "string-unpack-code",
-              "string-validate-input" ];
-var categories = [ "3d", "access", "bitops", "controlflow", "crypto",
-                   "date", "math", "regexp", "string" ];
+// var tests = [ "3d-cube", "3d-morph", "3d-raytrace",
+//               "access-binary-trees", "access-fannkuch",
+//               "access-nbody", "access-nsieve",
+//               "bitops-3bit-bits-in-byte", "bitops-bits-in-byte",
+//               "bitops-bitwise-and", "bitops-nsieve-bits",
+//               "controlflow-recursive", "crypto-aes",
+//               "crypto-md5", "crypto-sha1", "date-format-tofte",
+//               "date-format-xparb", "math-cordic", "math-partial-sums",
+//               "math-spectral-norm", "regexp-dna", "string-base64",
+//               "string-fasta", "string-tagcloud", "string-unpack-code",
+//               "string-validate-input" ];
+// var categories = [ "3d", "access", "bitops", "controlflow", "crypto",
+//                    "date", "math", "regexp", "string" ];
+
+var tests = [ "access-binary-trees" ];
+var categories = [ "access"];
 
 var results = new Array();
 
@@ -61,6 +64,7 @@ for (var j = 0; j < tests.length; j++) {
 function recordResults(tests, times)
 {
     var output = "";
+    print("tests: ",tests)
     // Changed original output to match test infrastructure.
     for (j = 0; j < tests.length; j++) {
         output += tests[j] + '-sunspider(RunTime): ' +

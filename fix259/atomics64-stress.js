@@ -9,30 +9,31 @@
 // Note that results of this test are flaky by design. While the test is
 // deterministic with a fixed seed, bugs may introduce non-determinism.
 
-load('test/mjsunit/wasm/wasm-module-builder.js');
+load('/home/cwang/work/v8/test/mjsunit/wasm/wasm-module-builder.js');
 
-const kDebug = false;
+const kDebug = true;
 
-const kSequenceLength = 25;
-const kNumberOfWorker = 4;
+// const kSequenceLength = 256;
+let kSequenceLength = 10;
+let kNumberOfWorker = 1;
 const kNumberOfSteps = 10000000;
 
 const kFirstOpcodeWithInput = 4;
 const kFirstOpcodeWithoutOutput = 4;
 const kLastOpcodeWithoutOutput = 7;
 
+
+// Instructions are ordered in 64, 8, 16, 32 bits size
+
 const opCodes = [
-  kExprI64AtomicLoad,        kExprI64AtomicLoad8U,     kExprI64AtomicLoad16U,
-  kExprI64AtomicLoad32U,     kExprI64AtomicStore,      kExprI64AtomicStore8U,
-  kExprI64AtomicStore16U,    kExprI64AtomicStore32U,   kExprI64AtomicAdd,
-  kExprI64AtomicAdd8U,       kExprI64AtomicAdd16U,     kExprI64AtomicAdd32U,
-  kExprI64AtomicSub,         kExprI64AtomicSub8U,      kExprI64AtomicSub16U,
-  kExprI64AtomicSub32U,      kExprI64AtomicAnd,        kExprI64AtomicAnd8U,
-  kExprI64AtomicAnd16U,      kExprI64AtomicAnd32U,     kExprI64AtomicOr,
-  kExprI64AtomicOr8U,        kExprI64AtomicOr16U,      kExprI64AtomicOr32U,
-  kExprI64AtomicXor,         kExprI64AtomicXor8U,      kExprI64AtomicXor16U,
-  kExprI64AtomicXor32U,      kExprI64AtomicExchange,   kExprI64AtomicExchange8U,
-  kExprI64AtomicExchange16U, kExprI64AtomicExchange32U
+  kExprI64AtomicLoad,     kExprI64AtomicLoad8U,     kExprI64AtomicLoad16U,      kExprI64AtomicLoad32U,    // No input, Has output
+  kExprI64AtomicStore,    kExprI64AtomicStore8U,    kExprI64AtomicStore16U,     kExprI64AtomicStore32U,   // Has input, No output
+  kExprI64AtomicAdd,      kExprI64AtomicAdd8U,      kExprI64AtomicAdd16U,       kExprI64AtomicAdd32U,     // Has input, Has output
+  kExprI64AtomicSub,      kExprI64AtomicSub8U,      kExprI64AtomicSub16U,       kExprI64AtomicSub32U,     // Has input, Has output
+  kExprI64AtomicAnd,      kExprI64AtomicAnd8U,      kExprI64AtomicAnd16U,       kExprI64AtomicAnd32U,     // Has input, Has output
+  kExprI64AtomicOr,       kExprI64AtomicOr8U,       kExprI64AtomicOr16U,        kExprI64AtomicOr32U,      // Has input, Has output
+  kExprI64AtomicXor,      kExprI64AtomicXor8U,      kExprI64AtomicXor16U,       kExprI64AtomicXor32U,     // Has input, Has output
+  kExprI64AtomicExchange, kExprI64AtomicExchange8U, kExprI64AtomicExchange16U,  kExprI64AtomicExchange32U // Has input, Has output
 ];
 
 const opCodeNames = [
@@ -64,6 +65,11 @@ let gPrivateMemory =
 let gPrivateMemoryView = new Int32Array(gPrivateMemory.buffer);
 
 const kMaxInt32 = (1 << 31) * 2;
+
+
+
+// Class Operation
+
 
 class Operation {
   constructor(opcode, low_input, high_input, offset) {
@@ -133,19 +139,21 @@ class Operation {
   }
 
   truncateResultBits(low, high) {
+    // print("low",low.toString(16),"high",high.toString(16),"offset",this.offset)
     if (this.size == 64)
       return [low, high]
 
-          // Shift the lower part. For offsets greater four it drops out of the
-          // visible window.
-          let shiftedL = this.offset >= 4 ? 0 : low >>> (this.offset * 8);
+    // Shift the lower part.
+    // For offsets greater than 4(bytes), it drops out of the visible window.
+    let shiftedL = this.offset >= 4 ? 0 : low >>> (this.offset * 8);
     // The higher part is zero for offset 0, left shifted for [1..3] and right
     // shifted for [4..7].
     let shiftedH = this.offset == 0 ?
         0 :
-        this.offset >= 4 ? high >>> (this.offset - 4) * 8 :
-                           high << ((4 - this.offset) * 8);
-    let value = shiftedL | shiftedH;
+        this.offset >= 4 ? high >>> (this.offset - 4) * 8 : // No matching Lower half part
+                           high << ((4 - this.offset) * 8); // To match Lower half part
+    let value = shiftedL | shiftedH; // Matching
+    // print("Value", value.toString(16))
 
     switch (this.size) {
       case 8:
@@ -185,6 +193,7 @@ class Operation {
 
   compute(state) {
     let evalFun = Operation.exports[this.key];
+    // print(evalFun)
     if (!evalFun) {
       let builder = Operation.builder;
       let body = [
@@ -192,55 +201,85 @@ class Operation {
         kExprI32Const, 0,
         // Load expected value.
         kExprLocalGet, 0, kExprI32StoreMem, 2, 0,
+        
         // Load address of high 32 bits.
         kExprI32Const, 4,
         // Load expected value.
         kExprLocalGet, 1, kExprI32StoreMem, 2, 0,
+
         // Load address of where our window starts.
         kExprI32Const, 0,
         // Load input if there is one.
         ...(this.hasInput ?
                 [
-                  kExprLocalGet, 3, kExprI64UConvertI32, kExprI64Const, 32,
-                  kExprI64Shl, kExprLocalGet, 2, kExprI64UConvertI32,
+                  kExprLocalGet, 3, kExprI64UConvertI32, 
+                  kExprI64Const, 32,
+                  kExprI64Shl, 
+                  kExprLocalGet, 2, kExprI64UConvertI32,
                   kExprI64Ior
                 ] :
                 []),
+
         // Perform operation.
+        // wasmOpcode: [opcode, alignment, offset].
         kAtomicPrefix, ...this.wasmOpcode,
+
         // Drop output if it had any.
         ...(this.hasOutput ? [kExprDrop] : []),
+
         // Return.
         kExprReturn
       ]
+      
+      // Add and export function body.
       builder.addFunction(this.key, kSig_v_iiii)
           .addBody(body)
           .exportAs(this.key);
+      
       // Instantiate module, get function exports.
       let module = new WebAssembly.Module(builder.toBuffer());
+
+      // m? mapping? 
       Operation.instance =
           new WebAssembly.Instance(module, {m: {imported_mem: gPrivateMemory}});
+      
+      // Exports is "Insstace's 'readonly exports: Exports;'".
       evalFun = Operation.exports[this.key];
     }
     evalFun(state.low, state.high, this.low_input, this.high_input);
     let ta = gPrivateMemoryView;
     if (kDebug) {
+      // print("truncate Called in compute")
+      let tResult = this.truncateResultBits(this.low_input,this.high_input)
+      // print(tResult)
       print(
-          state.high + ':' + state.low + ' ' + this.toString() + ' -> ' +
-          ta[1] + ':' + ta[0]);
+          '\nState:\t' + state.high.toString(16) + ':' + state.low.toString(16) + 
+          '\nOpera:\t[' +
+          tResult[1].toString(16) +
+          ':' + tResult[0].toString(16) +
+          ']\t' + this.toString() +
+          '\nNewSt:\t' + ta[1].toString(16) + ':' + ta[0].toString(16) + '\n');
     }
     return {low: ta[0], high: ta[1]};
   }
+  get name(){
+    return opCodeNames[this.opcode]
+  }
 
   toString() {
-    return opCodeNames[this.opcode] + '[+' + this.offset + '] ' +
-        this.high_input + ':' + this.low_input;
+    return opCodeNames[this.opcode] + '\t[+' + this.offset + '] ' +
+        this.high_input.toString(16) + ':' + this.low_input.toString(16);
   }
 
   get key() {
     return this.opcode + '-' + this.offset;
   }
 }
+
+
+
+// Class State
+
 
 class State {
   constructor(low, high, indices, count) {
@@ -255,9 +294,18 @@ class State {
   }
 
   toString() {
-    return this.high + ':' + this.low + ' @ ' + this.indices;
+    return this.count + '\n ' + this.high + ':' + this.low + '\n process:' + this.indices;
   }
 }
+
+
+
+
+
+// Global Methods
+
+
+
 
 function makeSequenceOfOperations(size) {
   let result = new Array(size);
@@ -355,7 +403,7 @@ function spawnWorkers() {
               let index = msg.index;
               let spin = msg.spin;
               let result = instance.exports["worker" + index](address, sequence, spin);
-              postMessage({index: index, sequence: sequence, result: result});
+	      postMessage({index: index, sequence: sequence, result: result});
             }
         }`,
         {type: 'string'});
@@ -426,28 +474,40 @@ function findSequentialOrdering() {
   let matchingStates = [new State(0, 0, startIndices, 0)];
   while (matchingStates.length > 0) {
     let current = matchingStates.pop();
-    if (kDebug) {
-      print(current);
-    }
+    // if (kDebug) {
+    //   print('current state:\n', current);
+    // }
     let matchingResults = selectMatchingWorkers(current);
     if (matchingResults.length == 0) {
       continue;
+    } else {
+      // print(' matching workers:',matchingResults);
     }
+    
     for (let match of matchingResults) {
       let newState = computeNextState(current, match);
       if (newState.isFinal()) {
+        print('[MYDBG] PASS at step:',steps)
         return true;
       }
       matchingStates.push(newState);
     }
-    if (steps++ > kNumberOfSteps) {
+    
+    if (steps++ >= kNumberOfSteps) {
       print('Search timed out, aborting...');
-      return true;
+      break;
     }
   }
   // We have no options left.
+  print('[MYDBG] FAIL at step:',steps)
+
   return false;
 }
+
+
+
+// Debugging tools`
+
 
 // Helpful for debugging failed tests.
 function loadSequencesFromStrings(inputs) {
@@ -456,14 +516,14 @@ function loadSequencesFromStrings(inputs) {
     reverseOpcodes[opCodeNames[i]] = i;
   }
   let sequences = [];
-  let parseRE = /([a-zA-Z0-9]*)\[\+([0-9])\] ([\-0-9]*)/;
+  let parseRE = /([a-zA-Z0-9]*)\[\+([0-9])\] ([\-0-9]*)\:([\-0-9]*)/;
   for (let input of inputs) {
     let parts = input.split(',');
     let sequence = [];
     for (let part of parts) {
       let parsed = parseRE.exec(part);
       sequence.push(
-          new Operation(reverseOpcodes[parsed[1]], parsed[3], parsed[2] | 0));
+          new Operation(reverseOpcodes[parsed[1]], parsed[4]| 0, parsed[3] | 0, parsed[2]| 0));
     }
     sequences.push(sequence);
   }
@@ -484,20 +544,61 @@ function loadResultsFromStrings(inputs) {
   return results;
 }
 
+
+
+
+
+
+// Main program
+
+
+
+
+
 let sequences = [];
 let results = [];
 
+// opcode, low_input, high_input, offset
+// [1,4,3,2]
+// let failcase = [
+//   'kExprI64AtomicSub16U[+6] 0:33346,kExprI64AtomicSub32U[+0] 0:-1780371402,kExprI64AtomicStore[+0] -210676296:-218378269,kExprI64AtomicAnd32U[+4] 0:-3896469060,kExprI64AtomicAdd8U[+7] 0:168',
+//   'kExprI64AtomicStore[+0] -2186975459:-3530762299,kExprI64AtomicSub8U[+0] 0:32,kExprI64AtomicStore32U[+0] 0:-2941226281,kExprI64AtomicAnd16U[+0] 0:39026,kExprI64AtomicStore16U[+4] 0:6885',
+//   'kExprI64AtomicAdd32U[+0] 0:-561519057,kExprI64AtomicStore16U[+0] 0:26424,kExprI64AtomicOr8U[+2] 0:6,kExprI64AtomicExchange8U[+5] 0:185,kExprI64AtomicExchange32U[+0] 0:-2291282342',
+//   'kExprI64AtomicExchange16U[+6] 0:43903,kExprI64AtomicSub8U[+3] 0:55,kExprI64AtomicStore8U[+7] 0:84,kExprI64AtomicAdd32U[+4] 0:-2147187638,kExprI64AtomicExchange16U[+0] 0:31914'
+// ]
+
+// let failcase = [
+//   'kExprI64AtomicSub16U[+6] 0:33346,kExprI64AtomicSub32U[+0] 0:-1780371402,kExprI64AtomicStore[+0] -210676296:-218378269,kExprI64AtomicAnd32U[+4] 0:-3896469060,kExprI64AtomicAdd8U[+7] 0:168',
+
+// ]
+let failcase = [
+  'kExprI64AtomicSub16U[+6] 0:33346',
+
+]
+kNumberOfWorker = failcase.length
 let builder = new WasmModuleBuilder();
 builder.addImportedMemory('m', 'imported_mem', 0, kMaxMemPages, 'shared');
 
+// Load test sequence
+// sequences = loadSequencesFromStrings(failcase)
+// kSequenceLength = sequences[0].length
 for (let i = 0; i < kNumberOfWorker; i++) {
+  print('Worker:', i)
   sequences[i] = makeSequenceOfOperations(kSequenceLength);
+  
+  print('Sequence:')
+
+  for (let j = 0; j<kSequenceLength; j++){
+    print('', sequences[i][j])
+  }
   builder.addFunction('worker' + i, kSig_i_iii)
       .addBody(generateFunctionBodyForSequence(sequences[i]))
       .exportAs('worker' + i);
+  // break
 }
 
 // Instantiate module, get function exports.
+print("[MYDBG]Initializing")
 let module = new WebAssembly.Module(builder.toBuffer());
 let instance =
     new WebAssembly.Instance(module, {m: {imported_mem: gSharedMemory}});
@@ -507,8 +608,11 @@ let workers = spawnWorkers();
 // Set spin count.
 gSharedMemoryView[4] = kNumberOfWorker;
 instantiateModuleInWorkers(workers);
+
+print("[MYDBG]Executing")
 executeSequenceInWorkers(workers);
 
+print("[MYDBG]Collecting")
 if (!kDebug) {
   // Collect results, d8 style.
   for (let worker of workers) {
@@ -522,28 +626,26 @@ for (let worker of workers) {
   worker.terminate();
 }
 
-// In debug mode, print sequences and results.
-if (kDebug) {
-  for (let result of results) {
-    print(result);
-  }
-
-  for (let sequence of sequences) {
-    print(sequence);
+print("[MYDBG]Results")
+for (let i = 0; i < kNumberOfWorker; i++) {
+  print('Worker ' + i + ' :[ high : low ]');
+  // print(sequences[i]);
+  for (let j = 0; j < kSequenceLength; j++){
+    print('[',results[i][2*j].toString(16).padStart(8,'0'),':',
+    results[i][2*j+1].toString(16).padStart(8,'0'),']')
   }
 }
 
+
 // Try to reconstruct a sequential ordering.
+print("[MYDBG]Re-constructing")
 let passed = findSequentialOrdering();
+
+
 
 if (passed) {
   print('PASS');
-} else {
-  for (let i = 0; i < kNumberOfWorker; i++) {
-    print('Worker ' + i);
-    print(sequences[i]);
-    print(results[i]);
-  }
+  } else {
   print('FAIL');
   quit(-1);
 }

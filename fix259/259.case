@@ -1,0 +1,54 @@
+Worker 0
+kExprI64AtomicSub16U[+6] 0:33346,kExprI64AtomicSub32U[+0] 0:-1780371402,kExprI64AtomicStore[+0] -210676296:-218378269,kExprI64AtomicAnd32U[+4] 0:-3896469060,kExprI64AtomicAdd8U[+7] 0:168
+43903,0,2003684922,0,0,0,-210676296,0,19,0
+Worker 1
+kExprI64AtomicStore[+0] -2186975459:-3530762299,kExprI64AtomicSub8U[+0] 0:32,kExprI64AtomicStore32U[+0] 0:-2941226281,kExprI64AtomicAnd16U[+0] 0:39026,kExprI64AtomicStore16U[+4] 0:6885
+0,0,90,0,0,0,53219,0,0,0
+Worker 2
+kExprI64AtomicAdd32U[+0] 0:-561519057,kExprI64AtomicStore16U[+0] 0:26424,kExprI64AtomicOr8U[+2] 0:6,kExprI64AtomicExchange8U[+5] 0:185,kExprI64AtomicExchange32U[+0] 0:-2291282342
+764204997,0,0,0,20,0,235,0,-719946582,0
+Worker 3
+kExprI64AtomicExchange16U[+6] 0:43903,kExprI64AtomicSub8U[+3] 0:55,kExprI64AtomicStore8U[+7] 0:84,kExprI64AtomicAdd32U[+4] 0:-2147187638,kExprI64AtomicExchange16U[+0] 0:31914
+32165,0,12,0,0,0,691889949,0,48628,0
+
+Worker 0
+kExprI64AtomicSub16U[+6] 0:33346,kExprI64AtomicSub32U[+0] 0:-1780371402,kExprI64AtomicStore[+0] -210676296:-218378269,kExprI64AtomicAnd32U[+4] 0:398498236,kExprI64AtomicAdd8U[+7] 0:168
+32165,0,202663704,0,0,0,1417656605,0,148,0
+Worker 1
+kExprI64AtomicStore[+0] 2107991837:764204997,kExprI64AtomicSub8U[+0] 0:32,kExprI64AtomicStore32U[+0] 0:1353741015,kExprI64AtomicAnd16U[+0] 0:39026,kExprI64AtomicStore16U[+4] 0:6885
+0,0,56,0,0,0,46818,0,0,0
+Worker 2
+kExprI64AtomicAdd32U[+0] 0:-561519057,kExprI64AtomicStore16U[+0] 0:26424,kExprI64AtomicOr8U[+2] 0:6,kExprI64AtomicExchange8U[+5] 0:185,kExprI64AtomicExchange32U[+0] 0:2003684954
+764204997,0,0,0,50,0,103,0,1060540514,0
+Worker 3
+kExprI64AtomicExchange16U[+6] 0:43903,kExprI64AtomicSub8U[+3] 0:55,kExprI64AtomicStore8U[+7] 0:84,kExprI64AtomicAdd32U[+4] 0:-2147187638,kExprI64AtomicExchange16U[+0] 0:31914
+64355,0,118,0,0,0,339777820,0,52826,0
+
+Worker 0
+kExprI64AtomicSub16U[+6] 0:33346,kExprI64AtomicSub32U[+0] 0:-1780371402,kExprI64AtomicStore[+0] -210676296:-218378269,kExprI64AtomicAnd32U[+4] 0:398498236,kExprI64AtomicAdd8U[+7] 0:168
+43903,0,1080917162,0,0,0,-210676296,0,19,0
+Worker 1
+kExprI64AtomicStore[+0] 2107991837:764204997,kExprI64AtomicSub8U[+0] 0:32,kExprI64AtomicStore32U[+0] 0:1353741015,kExprI64AtomicAnd16U[+0] 0:39026,kExprI64AtomicStore16U[+4] 0:6885
+0,0,56,0,0,0,29399,0,0,0
+Worker 2
+kExprI64AtomicAdd32U[+0] 0:-561519057,kExprI64AtomicStore16U[+0] 0:26424,kExprI64AtomicOr8U[+2] 0:6,kExprI64AtomicExchange8U[+5] 0:185,kExprI64AtomicExchange32U[+0] 0:2003684954
+764204997,0,0,0,20,0,103,0,1353715794,0
+Worker 3
+kExprI64AtomicExchange16U[+6] 0:43903,kExprI64AtomicSub8U[+3] 0:55,kExprI64AtomicStore8U[+7] 0:84,kExprI64AtomicAdd32U[+4] 0:-2147187638,kExprI64AtomicExchange16U[+0] 0:31914
+32165,0,119,0,0,0,691870437,0,52826,0
+
+RETURN PASS at step: 35
+PASS
+Worker 0
+kExprI64AtomicSub16U[+6] 0:33346,kExprI64AtomicSub32U[+0] 0:-1780371402,kExprI64AtomicStore[+0] -210676296:-218378269,kExprI64AtomicAnd32U[+4] 0:398498236,kExprI64AtomicAdd8U[+7] 0:168
+32165,0,1354104880,0,0,0,1416739256,0,20,0
+Worker 1
+kExprI64AtomicStore[+0] 2107991837:764204997,kExprI64AtomicSub8U[+0] 0:32,kExprI64AtomicStore32U[+0] 0:1353741015,kExprI64AtomicAnd16U[+0] 0:39026,kExprI64AtomicStore16U[+4] 0:6885
+0,0,197,0,0,0,26424,0,0,0
+Worker 2
+kExprI64AtomicAdd32U[+0] 0:-561519057,kExprI64AtomicStore16U[+0] 0:26424,kExprI64AtomicOr8U[+2] 0:6,kExprI64AtomicExchange8U[+5] 0:185,kExprI64AtomicExchange32U[+0] 0:2003684954
+764204965,0,0,0,176,0,85,0,-218378269,0
+Worker 3
+kExprI64AtomicExchange16U[+6] 0:43903,kExprI64AtomicSub8U[+3] 0:55,kExprI64AtomicStore8U[+7] 0:84,kExprI64AtomicAdd32U[+4] 0:-2147187638,kExprI64AtomicExchange16U[+0] 0:31914
+64355,0,186,0,0,0,-1136617032,0,52826,0
+

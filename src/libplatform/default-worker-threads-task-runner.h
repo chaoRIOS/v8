@@ -25,6 +25,10 @@ class V8_PLATFORM_EXPORT DefaultWorkerThreadsTaskRunner
   DefaultWorkerThreadsTaskRunner(uint32_t thread_pool_size,
                                  TimeFunction time_function);
 
+  DefaultWorkerThreadsTaskRunner(uint32_t thread_pool_size,
+                                 TimeFunction time_function,
+                                 const char* name );
+                                 
   ~DefaultWorkerThreadsTaskRunner() override;
 
   void Terminate();
@@ -45,6 +49,7 @@ class V8_PLATFORM_EXPORT DefaultWorkerThreadsTaskRunner
   class WorkerThread : public base::Thread {
    public:
     explicit WorkerThread(DefaultWorkerThreadsTaskRunner* runner);
+    explicit WorkerThread(DefaultWorkerThreadsTaskRunner* runner, const char* name);
     ~WorkerThread() override;
 
     // This thread attempts to get tasks in a loop from |runner_| and run them.
